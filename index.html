@@ -1,0 +1,4475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>短影音腳本產生器 V3｜IP人格 × 受眾洞察 × 10組腳本</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #A51820;
+  --primary-dark: #7A1018;
+  --primary-light: #C02030;
+  --bg-main: #FDFBF8;
+  --bg-card: #F4F1EC;
+  --bg-pink: #FAE8EA;
+  --bg-soft: #FDF3F4;
+  --text-main: #2A1A1C;
+  --text-muted: #7A5A5E;
+  --text-light: #B09498;
+  --border: #E8E3DA;
+  --cognition: #FFF4D6;
+  --cognition-text: #8B6914;
+  --brand: #DEEBF7;
+  --brand-text: #1E4E8C;
+  --trust: #D9ECD9;
+  --trust-text: #2E6B2E;
+  --conversion: #FAE8EA;
+  --conversion-text: #A51820;
+  --organization: #E7E0F0;
+  --organization-text: #5D4B8C;
+  --warning: #FFEEDD;
+  --warning-text: #B8611C;
+  --ai-bg: #FDF3F4;
+  --ai-accent: #A51820;
+  --ai-border: #F2DCDE;
+  --insight-bg: #FAE8EA;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== 頂部品牌條 ========== */
+.brand-bar {
+  background: var(--primary);
+  color: var(--bg-main);
+  padding: 14px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(165,24,32,0.15);
+}
+.brand-bar .logo {
+  font-family: 'Noto Serif TC', serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+.brand-bar .version-tag {
+  font-size: 10px;
+  background: rgba(255,255,255,0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  margin-left: 8px;
+}
+.brand-bar .step-indicator {
+  font-size: 13px;
+  opacity: 0.9;
+  font-weight: 300;
+}
+
+/* ========== 進度條 ========== */
+.progress-wrap {
+  background: var(--bg-card);
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+}
+.progress-bar {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.progress-stage { flex: 1; }
+.progress-stage-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.progress-stage.active .progress-stage-title { color: var(--primary); }
+.progress-steps-inner { display: flex; gap: 4px; }
+.progress-dot {
+  flex: 1; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  transition: all 0.4s;
+}
+.progress-dot.completed { background: var(--primary); }
+.progress-dot.current {
+  background: var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(192,32,48,0.2);
+}
+
+/* ========== 主要容器 ========== */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 32px 120px;
+}
+
+.step-header { margin-bottom: 32px; }
+.step-stage-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--primary);
+  background: var(--bg-pink);
+  padding: 4px 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+.step-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+}
+.step-subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ========== AI 分析卡（新） ========== */
+.ai-analysis-card {
+  background: linear-gradient(135deg, var(--ai-bg) 0%, var(--insight-bg) 100%);
+  border: 1px solid var(--ai-border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.ai-analysis-card::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(165,24,32,0.08), transparent);
+  border-radius: 50%;
+}
+.ai-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ai-accent);
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+.ai-label::before {
+  content: '✦';
+  font-size: 14px;
+}
+.ai-insight-text {
+  font-size: 14px;
+  color: var(--text-main);
+  line-height: 1.8;
+}
+.ai-insight-text strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+.ai-recommendation-tag {
+  display: inline-block;
+  background: var(--ai-accent);
+  color: white;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* ========== 選項卡片 ========== */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.options-grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.options-grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.options-grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+
+.option-card {
+  background: var(--bg-main);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  text-align: left;
+}
+.option-card:hover {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(165,24,32,0.08);
+}
+.option-card.selected {
+  border-color: var(--primary);
+  background: var(--bg-pink);
+  box-shadow: 0 4px 20px rgba(165,24,32,0.15);
+}
+.option-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.option-card.ai-recommended {
+  border-color: var(--ai-accent);
+  border-style: dashed;
+}
+.option-card.ai-recommended::before {
+  content: '✦ AI 推薦';
+  position: absolute;
+  top: -1px;
+  left: 12px;
+  background: var(--ai-accent);
+  color: white;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 0 0 4px 4px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.option-card.ai-recommended.selected {
+  border-style: solid;
+  border-color: var(--primary);
+}
+.option-emoji {
+  font-size: 28px;
+  margin-bottom: 10px;
+  display: block;
+}
+.option-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+.option-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.option-meta {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+/* 功能色標籤 */
+.option-card.tag-cognition { border-top: 4px solid #E5C766; }
+.option-card.tag-brand { border-top: 4px solid #6B9FD4; }
+.option-card.tag-trust { border-top: 4px solid #7BB37B; }
+.option-card.tag-conversion { border-top: 4px solid var(--primary); }
+.option-card.tag-organization { border-top: 4px solid #9B87C4; }
+
+.layer-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.layer-badge.cognition { background: var(--cognition); color: var(--cognition-text); }
+.layer-badge.brand { background: var(--brand); color: var(--brand-text); }
+.layer-badge.trust { background: var(--trust); color: var(--trust-text); }
+.layer-badge.conversion { background: var(--conversion); color: var(--conversion-text); }
+.layer-badge.organization { background: var(--organization); color: var(--organization-text); }
+
+/* ========== 輸入欄位 ========== */
+.input-group { margin-bottom: 24px; }
+.input-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+.input-helper {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+.text-input, .textarea-input, .select-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  background: var(--bg-main);
+  color: var(--text-main);
+  transition: border-color 0.2s;
+}
+.text-input:focus, .textarea-input:focus, .select-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.textarea-input { min-height: 80px; resize: vertical; }
+
+/* 三層下拉列 */
+.cascading-selects {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+/* 滑桿（量表） */
+.scale-group {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+.scale-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+.scale-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  outline: none;
+}
+.scale-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.scale-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+.scale-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+.scale-current-value {
+  text-align: center;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--bg-main);
+  border-radius: 6px;
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 14px;
+}
+
+/* ========== 複選 + 優先級 ========== */
+.priority-group {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+.priority-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-main);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+}
+.priority-item.selected { border-color: var(--primary); }
+.priority-checkbox {
+  width: 20px; height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+.priority-item-name { flex: 1; font-weight: 500; font-size: 14px; }
+.priority-percent-input {
+  width: 80px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--primary);
+}
+.priority-total-row {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: var(--bg-main);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+}
+.priority-total-row.valid { color: #2E6B2E; }
+.priority-total-row.invalid { color: var(--primary); }
+
+/* ========== 導航按鈕 ========== */
+.nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-main);
+  border-top: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.04);
+  z-index: 50;
+}
+.nav-bar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+}
+.btn-primary {
+  background: var(--primary);
+  color: var(--bg-main);
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(165,24,32,0.25);
+}
+.btn-primary:disabled {
+  background: var(--text-light);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 2px solid var(--border);
+}
+.btn-ghost:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.step-counter {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ========== 歡迎頁 ========== */
+.welcome-screen {
+  padding: 60px 32px;
+  text-align: center;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.welcome-screen .brand-mark {
+  font-family: 'Noto Serif TC', serif;
+  color: var(--primary);
+  font-size: 14px;
+  letter-spacing: 4px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.welcome-screen h1 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--text-main);
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+  line-height: 1.3;
+}
+.welcome-screen h1 span { color: var(--primary); }
+.welcome-screen .lead {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin-bottom: 36px;
+  line-height: 1.8;
+}
+.feature-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 36px 0;
+}
+.feature-box {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: left;
+}
+.feature-box .icon { font-size: 28px; margin-bottom: 10px; display: block; }
+.feature-box .title { font-weight: 700; margin-bottom: 4px; color: var(--text-main); font-size: 14px; }
+.feature-box .desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+/* ========== 最終結果頁 ========== */
+.result-hero {
+  text-align: center;
+  padding: 30px 0 40px;
+  background: linear-gradient(180deg, var(--bg-pink) 0%, transparent 100%);
+  margin: -40px -32px 32px;
+  padding: 40px 32px;
+}
+.result-hero .badge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 4px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+
+/* AI 全面分析報告 */
+.ai-report {
+  background: linear-gradient(135deg, var(--ai-bg) 0%, var(--insight-bg) 100%);
+  border: 1px solid var(--ai-border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.ai-report-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ai-accent);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ai-report-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.ai-report-item {
+  background: rgba(255,255,255,0.6);
+  padding: 14px 16px;
+  border-radius: 8px;
+}
+.ai-report-item .label {
+  font-size: 11px;
+  color: var(--ai-accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.ai-report-item .value {
+  font-size: 14px;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+.ai-report-item .value strong { color: var(--primary); }
+
+/* 10個腳本區 */
+.scripts-section-title {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.scripts-section-subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.scripts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.script-card {
+  background: var(--bg-main);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.script-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+.script-card.expanded { border-color: var(--primary); }
+.script-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  background: var(--bg-card);
+}
+.script-card.expanded .script-card-header { background: var(--bg-pink); }
+.script-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.script-card-title {
+  flex: 1;
+  font-family: 'Noto Serif TC', serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+.script-card-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+.script-chevron {
+  transition: transform 0.3s;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.script-card.expanded .script-chevron { transform: rotate(180deg); }
+.script-card-body {
+  display: none;
+  padding: 20px;
+  border-top: 1px solid var(--border);
+}
+.script-card.expanded .script-card-body { display: block; }
+
+.script-section-mini {
+  margin-bottom: 16px;
+}
+.script-section-mini:last-child { margin-bottom: 0; }
+.section-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+}
+.section-label.hook { background: var(--cognition); color: var(--cognition-text); }
+.section-label.middle { background: var(--brand); color: var(--brand-text); }
+.section-label.cta { background: var(--conversion); color: var(--conversion-text); }
+.section-label.shot { background: var(--organization); color: var(--organization-text); }
+.script-line {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-main);
+  padding: 12px 16px;
+  background: var(--bg-soft);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 8px;
+}
+.script-line.highlight {
+  background: var(--bg-pink);
+  font-weight: 600;
+}
+.shot-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border-radius: 6px;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.script-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
+}
+.script-action-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-main);
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.script-action-btn:hover { border-color: var(--primary); color: var(--primary); }
+.script-action-btn.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* 混搭模式 */
+.mix-mode-section {
+  background: linear-gradient(135deg, var(--bg-pink) 0%, var(--bg-soft) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.mix-selected-count {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+/* 動作按鈕列 */
+.action-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.action-btn {
+  flex: 1;
+  min-width: 140px;
+  padding: 14px 20px;
+  border-radius: 8px;
+  font-family: 'Noto Sans TC', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid var(--border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.action-btn:hover { border-color: var(--primary); color: var(--primary); }
+.action-btn.primary {
+  background: var(--primary);
+  color: var(--bg-main);
+  border-color: var(--primary);
+}
+.action-btn.primary:hover { background: var(--primary-dark); color: var(--bg-main); }
+
+/* 警告 / 資訊區 */
+.alert-box {
+  background: var(--warning);
+  border-left: 4px solid var(--warning-text);
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--warning-text);
+  line-height: 1.6;
+}
+.alert-box strong { color: #8F3F0F; }
+.info-box {
+  background: var(--bg-pink);
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: var(--text-main);
+  line-height: 1.6;
+  border-left: 4px solid var(--primary);
+}
+
+/* 痛點選擇列表（新） */
+.pain-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.pain-option {
+  padding: 10px 14px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transition: all 0.2s;
+}
+.pain-option:hover { border-color: var(--primary-light); background: var(--bg-soft); }
+.pain-option.selected {
+  border-color: var(--primary);
+  background: var(--bg-pink);
+}
+.pain-option-checkbox {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.pain-option.selected .pain-option-checkbox {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  font-size: 11px;
+}
+.pain-option.selected .pain-option-checkbox::after { content: '✓'; font-weight: 700; }
+
+/* 動畫 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.screen { animation: fadeIn 0.3s ease; }
+
+/* 響應式 */
+@media (max-width: 768px) {
+  .container { padding: 24px 16px 140px; }
+  .welcome-screen h1 { font-size: 30px; }
+  .step-title { font-size: 24px; }
+  .options-grid, .options-grid.cols-2, .options-grid.cols-3, .options-grid.cols-4 {
+    grid-template-columns: 1fr;
+  }
+  .cascading-selects { grid-template-columns: 1fr; }
+  .ai-report-grid { grid-template-columns: 1fr; }
+  .brand-bar { padding: 12px 16px; }
+  .brand-bar .step-indicator { font-size: 11px; }
+  .progress-wrap { padding: 14px 16px; }
+  .nav-bar { padding: 12px 16px; }
+  .btn { padding: 10px 20px; font-size: 13px; }
+}
+
+.hidden { display: none !important; }
+
+/* ========== 餵養庫浮動面板 ========== */
+.feed-fab {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(165,24,32,0.35);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: all 0.2s;
+}
+.feed-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(165,24,32,0.45);
+}
+.feed-fab .badge-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--text-main);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  border: 2px solid white;
+}
+.feed-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(480px, 92vw);
+  height: 100vh;
+  background: var(--bg-main);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+  z-index: 200;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.feed-panel.open { transform: translateX(0); }
+.feed-panel-header {
+  padding: 20px 24px;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.feed-panel-header h3 {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+.feed-panel-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+}
+.feed-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+.feed-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.feed-tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+.feed-tab.active {
+  background: var(--bg-main);
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.feed-form {
+  background: var(--bg-card);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+.feed-form .input-group { margin-bottom: 12px; }
+.feed-form .input-label { font-size: 12px; }
+.feed-form .text-input, .feed-form .textarea-input, .feed-form .select-input {
+  font-size: 13px;
+  padding: 8px 12px;
+}
+.feed-form .textarea-input { min-height: 60px; }
+.feed-platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.feed-platform-chip {
+  padding: 6px 10px;
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.feed-platform-chip.selected {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.feed-item-card {
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.feed-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 8px;
+}
+.feed-item-platform {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--bg-pink);
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+.feed-item-delete {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 6px;
+}
+.feed-item-delete:hover { color: var(--primary); }
+.feed-item-hook {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 14px;
+  color: var(--text-main);
+  line-height: 1.6;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.feed-item-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.feed-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.feed-empty .big-icon { font-size: 48px; margin-bottom: 12px; }
+
+@media (max-width: 768px) {
+  .feed-fab { bottom: 80px; right: 16px; }
+  .feed-panel { width: 100vw; }
+}
+
+/* 簡報輸出（螢幕隱藏，列印時顯示） */
+.slide-export-preview {
+  display: none;
+}
+@media print {
+  body * { visibility: hidden; }
+  .slide-export-preview, .slide-export-preview * { visibility: visible; }
+  .slide-export-preview { display: block; position: absolute; left: 0; top: 0; width: 100%; }
+  .nav-bar, .brand-bar, .progress-wrap, .action-bar, .ai-enhance-slot { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- 頂部品牌條 -->
+<div class="brand-bar">
+  <div class="logo">
+    短影音代理營運｜腳本產生器
+    <span class="version-tag">V3.0</span>
+  </div>
+  <div class="step-indicator" id="stepIndicator"></div>
+</div>
+
+<!-- 進度條 -->
+<div class="progress-wrap hidden" id="progressWrap">
+  <div class="progress-bar">
+    <div class="progress-stage" data-stage="1">
+      <div class="progress-stage-title">客戶 × IP × 受眾</div>
+      <div class="progress-steps-inner">
+        <div class="progress-dot" data-step="1"></div>
+        <div class="progress-dot" data-step="2"></div>
+        <div class="progress-dot" data-step="3"></div>
+        <div class="progress-dot" data-step="4"></div>
+        <div class="progress-dot" data-step="5"></div>
+        <div class="progress-dot" data-step="6"></div>
+        <div class="progress-dot" data-step="7"></div>
+        <div class="progress-dot" data-step="8"></div>
+      </div>
+    </div>
+    <div class="progress-stage" data-stage="2">
+      <div class="progress-stage-title">策略 × KPI</div>
+      <div class="progress-steps-inner">
+        <div class="progress-dot" data-step="9"></div>
+        <div class="progress-dot" data-step="10"></div>
+      </div>
+    </div>
+    <div class="progress-stage" data-stage="3">
+      <div class="progress-stage-title">腳本生成</div>
+      <div class="progress-steps-inner">
+        <div class="progress-dot" data-step="11"></div>
+        <div class="progress-dot" data-step="12"></div>
+        <div class="progress-dot" data-step="13"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 主內容區 -->
+<div id="mainContent"></div>
+
+<!-- 底部導航 -->
+<div class="nav-bar hidden" id="navBar">
+  <div class="nav-bar-inner">
+    <button class="btn btn-ghost" id="prevBtn">← 上一步</button>
+    <div class="step-counter" id="stepCounter">步驟 1 / 13</div>
+    <button class="btn btn-primary" id="nextBtn">下一步 →</button>
+  </div>
+</div>
+
+<!-- 【新】餵養庫浮動按鈕 -->
+<button class="feed-fab" id="feedFab" title="靈感餵養庫">
+  📚
+  <span class="badge-count hidden" id="feedBadge">0</span>
+</button>
+
+<!-- 【新】餵養庫側邊面板 -->
+<div class="feed-panel" id="feedPanel">
+  <div class="feed-panel-header">
+    <h3>📚 靈感餵養庫</h3>
+    <button class="feed-panel-close" id="feedClose">✕</button>
+  </div>
+  <div class="feed-panel-body">
+    <div class="feed-tabs">
+      <button class="feed-tab active" data-feed-tab="add">➕ 新增靈感</button>
+      <button class="feed-tab" data-feed-tab="list">📋 已存清單</button>
+      <button class="feed-tab" data-feed-tab="howto">💡 怎麼用</button>
+    </div>
+    <div id="feedTabContent"></div>
+  </div>
+</div>
+
+<script id="dataScript">
+// ============================================================
+// 【V2 資料庫】基於國際產業分類 + 短影音實戰經驗整合
+// ============================================================
+
+// ═══════════════════════════════════════════════════════════
+// 產業分類（三層，基於 GICS + ISIC 改良，適用於短影音場景）
+// ═══════════════════════════════════════════════════════════
+const INDUSTRY_TREE = {
+  '專業服務業': {
+    '法律服務': ['商務法律', '家事法律', '智財法律', '刑事辯護', '勞資法律', '移民法律', '稅務法律'],
+    '醫療照護': ['一般醫療診所', '牙醫診所', '中醫診所', '醫美皮膚', '心理諮商', '物理治療', '獸醫診所'],
+    '財會金融': ['記帳士', '會計師', '財務顧問', '保險顧問', '稅務顧問', '投資顧問'],
+    '企業顧問': ['管理顧問', '人資顧問', '品牌顧問', '行銷顧問', '數位轉型顧問'],
+    '教育培訓': ['家教補習', '語言學習', '職涯教練', '技能培訓', '才藝教學', '證照補習'],
+  },
+  '零售電商': {
+    '服飾配件': ['女裝', '男裝', '童裝', '鞋包配件', '珠寶手錶'],
+    '美妝保養': ['彩妝', '保養品', '香水', '個人清潔'],
+    '食品飲料': ['零食伴手禮', '健康食品', '手搖飲', '咖啡茶', '酒類'],
+    '生活用品': ['家居家飾', '廚房用品', '清潔用品', '寵物用品'],
+    '3C電子': ['手機周邊', '電腦配件', '家電', '影音設備'],
+  },
+  '餐飲服務': {
+    '餐廳': ['西餐', '日式料理', '中式餐廳', '韓式料理', '東南亞料理', '異國料理'],
+    '輕食甜點': ['咖啡廳', '甜點店', '早午餐', '麵包店', '手搖飲'],
+    '酒吧夜店': ['酒吧', '居酒屋', '夜店', '清酒吧'],
+    '外送外賣': ['便當店', '雲端廚房', '定食'],
+  },
+  '健康美麗': {
+    '美容美髮': ['美髮沙龍', '美甲美睫', '彩妝工作室', 'SPA按摩', '護膚中心'],
+    '健身運動': ['健身房', '瑜珈', '拳擊', '舞蹈', '私人教練'],
+    '醫美整形': ['微整形', '雷射', '抽脂', '髮際線', '牙齒矯正'],
+    '營養保健': ['保健食品', '營養師', '減重中心', '抗老中心'],
+  },
+  '房產居家': {
+    '房仲建設': ['房屋仲介', '豪宅顧問', '租賃管理', '代銷業務', '建商'],
+    '室內設計': ['住宅設計', '商業空間', '系統家具', '裝修工程'],
+    '家用服務': ['清潔服務', '搬家服務', '修繕服務', '寵物照護'],
+  },
+  '科技服務': {
+    '軟體開發': ['App開發', '網站建置', 'SaaS服務', '客製化軟體'],
+    '行銷廣告': ['數位行銷', 'SEO顧問', '廣告投放', '社群代操', 'KOL經紀'],
+    '影音內容': ['影像製作', '短影音代理', 'Podcast製作', '直播代營運'],
+    'AI人工智慧': ['AI應用顧問', 'AI內容工具', 'AI教育訓練'],
+  },
+  '個人品牌': {
+    '知識型創作者': ['財經知識', '心靈成長', '職涯發展', '學習方法', '時間管理'],
+    '生活型創作者': ['美食探店', '旅遊分享', '穿搭風格', '居家生活', '育兒分享'],
+    '專業型創作者': ['律師IP', '醫師IP', '老師IP', '工程師IP', '設計師IP'],
+    '娛樂型創作者': ['搞笑短劇', '音樂舞蹈', '遊戲實況', '寵物日常'],
+  },
+  '其他': {
+    '非營利組織': ['公益團體', '基金會', '社會企業'],
+    'B2B服務業': ['企業採購', '工業產品', '商用服務', '批發貿易'],
+    '活動策展': ['展覽策劃', '活動公關', '婚禮顧問', '會議籌辦'],
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 世代分析（消費能力 + 短影音偏好）
+// ═══════════════════════════════════════════════════════════
+const GENERATIONS = {
+  'alpha': {
+    name: 'Alpha 世代',
+    age: '2013 之後出生｜約 12 歲以下',
+    power: '低（零用錢為主）',
+    traits: '原生 YouTube / TikTok 使用者，注意力極短，愛色彩、音樂、互動',
+    platform: 'YouTube Kids、TikTok、遊戲類 App',
+    emoji: '🎮',
+    buying: '透過父母決策'
+  },
+  'gen-z': {
+    name: 'Z 世代',
+    age: '1997-2012 出生｜約 13-28 歲',
+    power: '中（學生到職涯初期，敢花但預算有限）',
+    traits: '重視真實、討厭被推銷、愛梗、看重價值觀、會查評價',
+    platform: 'TikTok、Instagram、小紅書、YouTube Shorts',
+    emoji: '📱',
+    buying: '快速決策，靠短影音和UGC'
+  },
+  'millennial': {
+    name: '千禧世代',
+    age: '1981-1996 出生｜約 29-44 歲',
+    power: '高（職涯黃金期，家庭支出主力）',
+    traits: '品質與CP值並重、重視自我實現、願意為專業付費、數位原住民',
+    platform: 'Instagram、YouTube、LinkedIn、Facebook',
+    emoji: '💼',
+    buying: '會研究再購買，看重KOL推薦和案例'
+  },
+  'gen-x': {
+    name: 'X 世代',
+    age: '1965-1980 出生｜約 45-60 歲',
+    power: '極高（資產累積期，高可支配所得）',
+    traits: '重視品牌信譽、長期關係、實用性，對廣告警覺但對專業信任',
+    platform: 'Facebook、LINE、YouTube、部分 Instagram',
+    emoji: '🏆',
+    buying: '決策謹慎，需要多次接觸建立信任'
+  },
+  'boomer': {
+    name: '嬰兒潮世代',
+    age: '1946-1964 出生｜約 61-80 歲',
+    power: '高（退休金 + 累積資產）',
+    traits: '重視權威、人情、實體關係，偏好直接溝通',
+    platform: 'LINE、Facebook、YouTube（被動觀看為主）',
+    emoji: '👴',
+    buying: '偏好面對面或熟人推薦'
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 消費能力層級
+// ═══════════════════════════════════════════════════════════
+const SPENDING_LEVELS = {
+  'low': { name: '精打細算型', desc: '月可支配 < NT$15,000｜價格敏感', emoji: '🪙' },
+  'mid': { name: '中等消費型', desc: '月可支配 NT$15,000-50,000｜重 CP 值', emoji: '💵' },
+  'high': { name: '高消費型', desc: '月可支配 NT$50,000-150,000｜重品質', emoji: '💎' },
+  'luxury': { name: '頂級消費型', desc: '月可支配 > NT$150,000｜重品牌體驗', emoji: '👑' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 目標 + KPI（擴充版）
+// ═══════════════════════════════════════════════════════════
+const GOALS = {
+  '01': { name: '增加品牌曝光', layer: 'cognition', layerName: '認知層', kpi: ['觸及人數', '觀看次數', '分享數'], cta: '追蹤、留言', ctaStrength: 'soft' },
+  '02': { name: '提高品牌記憶點', layer: 'cognition', layerName: '認知層', kpi: ['回訪率', '系列觀看率'], cta: '追蹤、分享', ctaStrength: 'soft' },
+  '03': { name: '建立個人IP', layer: 'brand', layerName: '品牌層', kpi: ['粉絲成長率', '互動率'], cta: '追蹤、互動', ctaStrength: 'soft' },
+  '04': { name: '教育市場/改變認知', layer: 'brand', layerName: '品牌層', kpi: ['完播率', '收藏率'], cta: '收藏、私訊', ctaStrength: 'medium' },
+  '05': { name: '建立專業信任感', layer: 'trust', layerName: '信任層', kpi: ['收藏率5%+', '完播率40%+', '預約率'], cta: '預約、追蹤', ctaStrength: 'medium' },
+  '06': { name: '增加詢問量', layer: 'conversion', layerName: '轉化層', kpi: ['私訊數', '表單數', 'CTA點擊'], cta: '私訊、填表', ctaStrength: 'strong' },
+  '07': { name: '提升轉單品質', layer: 'conversion', layerName: '轉化層', kpi: ['有效詢問數', '成交率'], cta: '預約、填表', ctaStrength: 'strong' },
+  '08': { name: '直接帶業績', layer: 'conversion', layerName: '轉化層', kpi: ['銷售額', 'ROAS', '轉換率'], cta: '立即購買、限時', ctaStrength: 'strong' },
+  '09': { name: '活動導流', layer: 'conversion', layerName: '轉化層', kpi: ['報名數', '頁面點擊數'], cta: '報名、預約', ctaStrength: 'strong' },
+  '10': { name: '招募人才/吸引合作', layer: 'organization', layerName: '組織層', kpi: ['履歷數', '商務詢問數'], cta: '投履歷、合作私訊', ctaStrength: 'medium' },
+};
+
+// ═══════════════════════════════════════════════════════════
+// 鉤子模板庫（大擴充版 - 30+種）
+// ═══════════════════════════════════════════════════════════
+const HOOK_TYPES = {
+  'shock-number': {
+    name: '數字震驚型',
+    category: '快速吸睛',
+    emoji: '🔢',
+    use: '冷受眾、認知層、曝光型',
+    patterns: [
+      '{number}個{audience}不知道的{industry}秘密',
+      '{number}%的人在{pain}上犯了同樣的錯',
+      '我花了{money}學到的{industry}重點，{time}講完',
+      '{time}搞懂{industry}，你會少走{years}年冤枉路'
+    ]
+  },
+  'break-common': {
+    name: '打破常識型',
+    category: '反直覺',
+    emoji: '💥',
+    use: '信任層、教育市場、專業IP',
+    patterns: [
+      '你以為的{topic}，其實是錯的',
+      '{number}%的{audience}都搞錯了這件事',
+      '關於{topic}，大家都誤會了',
+      '如果還在{wrong_action}，你就慘了'
+    ]
+  },
+  'pain-direct': {
+    name: '痛點直擊型',
+    category: '情緒觸發',
+    emoji: '🎯',
+    use: '溫/熱受眾、轉化層',
+    patterns: [
+      '{audience}最怕的就是{pain}',
+      '如果你遇過{pain}，這支一定要看完',
+      '你是不是也在煩惱{pain}？',
+      '每個{audience}都會遇到的問題'
+    ]
+  },
+  'story-client': {
+    name: '客戶故事型',
+    category: '敘事引導',
+    emoji: '📖',
+    use: '信任層、專業IP、建立權威',
+    patterns: [
+      '上個月一個{audience}來找我，他遇到{pain}',
+      '我永遠記得那一次，一個客戶因為{pain}',
+      '這是我去年最印象深刻的一個案子',
+      '三年前我接過一個案子，跟你現在遇到的很像'
+    ]
+  },
+  'story-personal': {
+    name: '個人經歷型',
+    category: '敘事引導',
+    emoji: '💭',
+    use: '品牌層、個人IP、建立連結',
+    patterns: [
+      '我一開始做{industry}的時候，也犯過這個錯',
+      '這是我{years}年前最痛的一次教訓',
+      '我也曾經跟你一樣，以為{wrong_belief}',
+      '在我{years}歲那年，我第一次遇到{pain}'
+    ]
+  },
+  'question-hook': {
+    name: '懸念提問型',
+    category: '認知啟動',
+    emoji: '❓',
+    use: '全層可用、教育型內容',
+    patterns: [
+      '你知道為什麼{audience}總是{pain}嗎？',
+      '如果是你遇到{pain}，你會怎麼做？',
+      '為什麼有些人就是做得到？',
+      '{audience}最常問我的問題，答案會讓你意外'
+    ]
+  },
+  'challenge': {
+    name: '挑戰權威型',
+    category: '反直覺',
+    emoji: '⚔️',
+    use: '品牌層、觀點型IP',
+    patterns: [
+      '我要說一個得罪人的真相',
+      '你聽過的{topic}建議，大部分都是錯的',
+      '我不認同大家都在講的{common_belief}',
+      '這個行業最不想讓你知道的事'
+    ]
+  },
+  'benefit-stack': {
+    name: '利益堆疊型',
+    category: '快速吸睛',
+    emoji: '🎁',
+    use: '轉化層、直接導流',
+    patterns: [
+      '用這個方法，{benefit1}、{benefit2}、{benefit3}',
+      '{time}內讓你{result}',
+      '不用{pain_thing}，也能{benefit}',
+      '花{low_cost}換{high_value}'
+    ]
+  },
+  'curiosity-gap': {
+    name: '好奇缺口型',
+    category: '認知啟動',
+    emoji: '🔍',
+    use: '認知層、完播率',
+    patterns: [
+      '我要告訴你一個祕密',
+      '這件事99%的人不知道',
+      '等下我會講一個重點，你最好記起來',
+      '影片最後有個彩蛋，一定要看到最後'
+    ]
+  },
+  'scene-setting': {
+    name: '情境還原型',
+    category: '敘事引導',
+    emoji: '🎬',
+    use: '故事型、共鳴感',
+    patterns: [
+      '想像一下，你是{audience}，你遇到{situation}',
+      '凌晨三點，我接到一通電話',
+      '那天下午，辦公室突然⋯',
+      '星期一早上，當你打開信箱看到⋯'
+    ]
+  },
+  'comparison': {
+    name: '對比反差型',
+    category: '快速吸睛',
+    emoji: '⚖️',
+    use: '教育型、信任層',
+    patterns: [
+      'A做法跟B做法，差在這一步',
+      '同樣是{audience}，為什麼他成功你失敗？',
+      '以前我也這樣做，結果踩了大雷',
+      '{wrong_way} vs {right_way}'
+    ]
+  },
+  'fomo-urgent': {
+    name: '緊迫感型',
+    category: '情緒觸發',
+    emoji: '⏰',
+    use: '轉化層、活動導流',
+    patterns: [
+      '只剩{time}，這個機會過了就沒了',
+      '如果你現在還沒{action}，你已經慢了',
+      '2026年{topic}最後的紅利期',
+      '再不{action}就來不及了'
+    ]
+  },
+  'problem-solution': {
+    name: '問題—方案型',
+    category: '認知啟動',
+    emoji: '🧩',
+    use: '知識型、信任層',
+    patterns: [
+      '{audience}總是遇到{pain}，原因在這',
+      '解決{pain}只要做這一件事',
+      '為什麼{pain}一直解決不了？',
+      '我教你{number}招徹底擺脫{pain}'
+    ]
+  },
+  'insider-secret': {
+    name: '內行揭秘型',
+    category: '反直覺',
+    emoji: '🔓',
+    use: '信任層、專業IP',
+    patterns: [
+      '做{industry}的都知道，但不會跟你說的事',
+      '業內人才懂的{topic}真相',
+      '一個{industry}從業者的真心話',
+      '這些話我客戶付錢我才會講'
+    ]
+  },
+  'controversial': {
+    name: '爭議話題型',
+    category: '情緒觸發',
+    emoji: '🔥',
+    use: '品牌層、個人IP',
+    patterns: [
+      '我知道我說這個會被罵',
+      '可能有人不同意，但我還是要說',
+      '這個觀點很政治不正確，但我要講實話',
+      '得罪大家了，但這是事實'
+    ]
+  },
+  'quick-tip': {
+    name: '快速技巧型',
+    category: '快速吸睛',
+    emoji: '⚡',
+    use: '認知層、完播率',
+    patterns: [
+      '{number}秒學會{skill}',
+      '這一招幫我省了{time}/{money}',
+      '我做{industry}{years}年，總結成{number}條',
+      '用這個方法，立刻{benefit}'
+    ]
+  }
+};
+
+// 鉤子分類（方便 UI 呈現）
+const HOOK_CATEGORIES = {
+  '快速吸睛': '前3秒拉住眼球，適合冷流量',
+  '反直覺': '打破既定認知，觸發好奇心',
+  '情緒觸發': '點燃情緒，產生共鳴',
+  '敘事引導': '用故事帶入，建立信任',
+  '認知啟動': '引發思考，建立權威'
+};
+
+// 目標 → 推薦鉤子（多個選擇）
+const GOAL_HOOK_MAP = {
+  '01': ['shock-number', 'curiosity-gap', 'quick-tip', 'comparison'],
+  '02': ['story-personal', 'scene-setting', 'quick-tip'],
+  '03': ['story-personal', 'question-hook', 'controversial', 'insider-secret'],
+  '04': ['break-common', 'comparison', 'problem-solution', 'insider-secret'],
+  '05': ['break-common', 'story-client', 'insider-secret', 'problem-solution'],
+  '06': ['pain-direct', 'question-hook', 'problem-solution'],
+  '07': ['pain-direct', 'story-client', 'comparison'],
+  '08': ['benefit-stack', 'fomo-urgent', 'story-client'],
+  '09': ['fomo-urgent', 'benefit-stack', 'pain-direct'],
+  '10': ['story-personal', 'challenge', 'question-hook']
+};
+
+// ═══════════════════════════════════════════════════════════
+// 中段結構（擴充版）
+// ═══════════════════════════════════════════════════════════
+const MIDDLE_STRUCTURES = {
+  'knowledge-3': {
+    name: '知識型（3點式）',
+    desc: '提問→原因→3個方法→重點強調',
+    emoji: '📚',
+    suitFor: ['05', '04', '06'],
+    structure: ['提問引入情境', '解釋為什麼', '給 3 個方法', '重點強調記憶點']
+  },
+  'knowledge-pyramid': {
+    name: '知識型（金字塔）',
+    desc: '結論先行→論據1→論據2→總結',
+    emoji: '🔺',
+    suitFor: ['04', '05', '03'],
+    structure: ['先下結論', '論據 1', '論據 2', '總結強化']
+  },
+  'story-problem-solve': {
+    name: '故事型（問題解決）',
+    desc: '情境→衝突→轉折→結果',
+    emoji: '🎭',
+    suitFor: ['05', '07', '08'],
+    structure: ['介紹主角背景', '問題浮現', '轉折關鍵', '成果呈現']
+  },
+  'story-timeline': {
+    name: '故事型（時間軸）',
+    desc: '過去→現在→未來',
+    emoji: '📅',
+    suitFor: ['03', '02', '10'],
+    structure: ['過去的我/情境', '關鍵轉折', '現在的狀態', '未來的方向']
+  },
+  'opinion-defense': {
+    name: '觀點型（立場+辯護）',
+    desc: '立場→理由×3→反方→回應',
+    emoji: '💡',
+    suitFor: ['03', '04', '05'],
+    structure: ['立場宣告', '理由 1', '理由 2', '理由 3', '反方說法', '你的回應']
+  },
+  'opinion-contrast': {
+    name: '觀點型（對比）',
+    desc: '大家以為→其實不是→為什麼',
+    emoji: '🔄',
+    suitFor: ['04', '05', '03'],
+    structure: ['大家的普遍認知', '你的不同看法', '理由', '行動建議']
+  },
+  'demo-step': {
+    name: '操作示範型',
+    desc: '第一步→第二步→第三步→完成',
+    emoji: '👉',
+    suitFor: ['06', '08', '04'],
+    structure: ['前置準備', '步驟 1', '步驟 2', '步驟 3', '完成效果']
+  },
+  'fast-list': {
+    name: '清單快節奏型',
+    desc: '5-10個重點快速帶過',
+    emoji: '📋',
+    suitFor: ['01', '02', '04'],
+    structure: ['主題宣告', '重點 × 5', '結尾收束']
+  },
+  'emotional-arc': {
+    name: '情感起伏型',
+    desc: '平常→低谷→反轉→頂峰',
+    emoji: '📈',
+    suitFor: ['03', '08', '07'],
+    structure: ['平常狀態', '跌入低谷', '找到方法', '反轉成果']
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// CTA 範本（依目標 + CTA 強度）
+// ═══════════════════════════════════════════════════════════
+const CTA_LIBRARY = {
+  soft: {
+    name: '軟性 CTA',
+    desc: '不催促，維持觀眾關係',
+    templates: [
+      '追蹤我，下次分享更多',
+      '如果你也這樣想，按個愛心',
+      '留言告訴我你的想法',
+      '儲存起來，以後用得到',
+      '分享給需要的朋友'
+    ]
+  },
+  medium: {
+    name: '中等 CTA',
+    desc: '引導到更深層互動',
+    templates: [
+      '追蹤我，每週讓你多懂一件事',
+      '有問題嗎？留言告訴我',
+      '想了解更多？私訊我「關鍵字」',
+      '更完整的在置頂影片',
+      '加入我的社群，每週收到更新'
+    ]
+  },
+  strong: {
+    name: '強烈 CTA',
+    desc: '直接導向轉換',
+    templates: [
+      'Line 私訊「XX」，免費幫你分析',
+      '現在預約享早鳥優惠，連結在主頁',
+      '只剩 X 個名額，手刀報名',
+      '點下方連結立即預約',
+      '私訊我「諮詢」，我們先聊聊'
+    ]
+  },
+  none: {
+    name: '不設 CTA',
+    desc: '衝完播率時使用，避免打斷',
+    templates: [
+      '（影片以重點強化收尾，不做呼籲）',
+      '（用意料外的結論留下餘韻）',
+      '（用反問句結尾，引發留言）'
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 運鏡風格
+// ═══════════════════════════════════════════════════════════
+const SHOT_STYLES = {
+  'sit-interview': { name: '坐姿直述', desc: '鏡頭穩定、正面特寫', emoji: '🪑', suitFor: '信任、專業、教育型', effort: '低' },
+  'walk-dynamic': { name: '走動式', desc: '邊走邊說、節奏感強', emoji: '🚶', suitFor: '個人品牌、生活感', effort: '中' },
+  'multi-scene': { name: '多場景切換', desc: '2-3個場景交錯', emoji: '🎬', suitFor: '故事型、情境還原', effort: '高' },
+  'visual-cards': { name: '字卡視覺化', desc: '文字+畫面重點', emoji: '📝', suitFor: '知識型、快節奏', effort: '中' },
+  'demo-action': { name: '示範操作', desc: '實際展示過程', emoji: '👐', suitFor: '操作教學、產品展示', effort: '中' },
+  'talking-head': { name: '單人對話', desc: '直視鏡頭像聊天', emoji: '🎤', suitFor: '個人IP、深度內容', effort: '低' },
+  'doc-style': { name: '紀錄片式', desc: '旁白+B-roll', emoji: '🎞️', suitFor: '品牌故事、深度報導', effort: '高' },
+  'interactive': { name: '互動式', desc: '對話、採訪、反應', emoji: '💬', suitFor: '故事、娛樂、測驗', effort: '高' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 影片長度（加入45秒+適配警示）
+// ═══════════════════════════════════════════════════════════
+const VIDEO_LENGTHS = {
+  '15': { name: '15秒', desc: '衝擊短片', goodFor: ['01', '02'], warn: '太短放不下強 CTA' },
+  '30': { name: '30秒', desc: '黃金標準', goodFor: ['01', '02', '03', '05'], warn: null },
+  '45': { name: '45秒', desc: '平衡長度', goodFor: ['03', '04', '05', '06'], warn: null },
+  '60': { name: '60秒', desc: '完整敘事', goodFor: ['04', '05', '07'], warn: '對完播率要求高' },
+  '90': { name: '90秒', desc: '深度內容', goodFor: ['04', '05', '07', '10'], warn: '完播率可能掉到 25% 以下' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 產業常見痛點庫（AI 引導用）
+// ═══════════════════════════════════════════════════════════
+const INDUSTRY_PAIN_POINTS = {
+  '法律服務': [
+    '不知道問題算不算「要找律師」',
+    '怕問律師一題就被收錢',
+    '不懂法律術語，看不懂合約',
+    '找過律師但溝通不順',
+    '被對方告了不知道怎麼辦',
+    '想預防法律風險但不知從何開始'
+  ],
+  '醫療照護': [
+    '看診時間太短，問不到關鍵問題',
+    '網路資訊太雜，不知道誰對誰錯',
+    '想治療但怕選錯診所/醫師',
+    '副作用和風險不透明',
+    '費用不透明，怕被多收錢',
+    '治療後不知道怎麼保養'
+  ],
+  '財會金融': [
+    '不知道怎麼合法節稅',
+    '帳一直算不對，花太多時間處理',
+    '怕找錯會計師遇到糾紛',
+    '想投資但不知從何開始',
+    '收入到一定規模後不知道怎麼規劃',
+    '跨境業務不知道怎麼報稅'
+  ],
+  '美妝保養': [
+    '產品太多不知道怎麼選',
+    '成分看不懂，怕買到踩雷',
+    '用了沒效果，浪費錢',
+    '皮膚敏感不敢亂試',
+    '保養步驟太複雜，懶得執行',
+    '想變美但預算有限'
+  ],
+  '健身運動': [
+    '想運動但不知道從哪開始',
+    '自己練沒效果，懷疑動作錯誤',
+    '工作太忙沒時間運動',
+    '怕去健身房被看或被推銷',
+    '吃的怎麼搭配搞不清楚',
+    '目標一直達不到會沮喪'
+  ],
+  '房產居家': [
+    '看房不知道該問什麼',
+    '怕買到漏水、輻射屋',
+    '議價不會出招',
+    '想換屋但不知道時機',
+    '貸款條件搞不懂',
+    '裝修預算一直超支'
+  ],
+  '美容美髮': [
+    '每次換髮型都踩雷',
+    '設計師聽不懂我想要什麼',
+    '染燙後頭髮受損嚴重',
+    '保養品用錯反而過敏',
+    '不知道自己適合什麼造型',
+    '想變美但不想花太多錢'
+  ],
+  '醫美整形': [
+    '不知道自己適合做什麼',
+    '怕效果不自然',
+    '術後照顧不知道怎麼做',
+    '價格不透明，怕被當盤子',
+    '想看案例但都覺得假',
+    '怕過度諮詢反而被推銷'
+  ],
+  '教育培訓': [
+    '學完後不知道怎麼應用',
+    '想學但不知道選哪個老師',
+    '時間不夠，學不下去',
+    '學費太貴，不確定值不值',
+    '自學沒方向，效率低',
+    '學了沒人帶，容易放棄'
+  ],
+  // 預設（找不到產業時使用）
+  '_default': [
+    '不知道從哪裡開始',
+    '看過很多資訊但整合不起來',
+    '怕踩雷浪費錢',
+    '想做但沒時間',
+    '看不懂專業術語',
+    '找過其他服務但效果不好'
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════
+// 客戶類型量表（個人 ←→ 組織）
+// ═══════════════════════════════════════════════════════════
+const CLIENT_TYPE_SCALE = {
+  1: { name: '純個人品牌', desc: '一個人在做內容，以個人名義出現', emoji: '🧑' },
+  2: { name: '個人工作室', desc: '1-2人，以個人為主但有助手', emoji: '👥' },
+  3: { name: '小型團隊', desc: '3-10人，有品牌但創辦人仍是核心', emoji: '🏢' },
+  4: { name: '中型組織', desc: '11-50人，品牌大於創辦人', emoji: '🏬' },
+  5: { name: '大型企業', desc: '50人以上，完整企業識別', emoji: '🏛️' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// B2B/B2C 智慧判斷題組
+// ═══════════════════════════════════════════════════════════
+const B2B_B2C_QUESTIONS = [
+  {
+    q: '你客戶的主要服務對象是誰？',
+    options: [
+      { val: 'b2c', label: '一般消費者（C端）', desc: '個人買單使用' },
+      { val: 'b2b', label: '其他企業/組織（B端）', desc: '公司採購使用' },
+      { val: 'both', label: '兩邊都有', desc: '個人和企業都服務' }
+    ]
+  },
+  {
+    q: '決策週期通常多長？',
+    options: [
+      { val: 'b2c', label: '快（當下或幾天內）', desc: '衝動購買或短期決策' },
+      { val: 'b2b', label: '慢（數週到數月）', desc: '多方評估，多人決策' },
+      { val: 'mixed', label: '中等', desc: '個人較慢、企業較快' }
+    ]
+  },
+  {
+    q: '客單價大約多少？',
+    options: [
+      { val: 'b2c', label: '1萬以下', desc: '低客單，快消費' },
+      { val: 'mid', label: '1-10萬', desc: '中客單，需要信任' },
+      { val: 'b2b', label: '10萬以上', desc: '高客單,長決策' }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// 【新增】IP 人格深度洞察 - 7 大維度（深度型）
+// 專為代理內部使用，不對外展示
+// ═══════════════════════════════════════════════════════════
+const IP_PERSONALITY_DIMENSIONS = [
+  {
+    key: 'coreTrait',
+    label: '核心性格',
+    icon: '🧭',
+    description: '這個人最根本的性格傾向，決定他在鏡頭前自然的樣子',
+    options: [
+      { val: 'analytical', title: '理性分析型', desc: '邏輯清楚、重證據、講道理', camera: '適合坐姿直述、知識型內容' },
+      { val: 'warm-empathic', title: '溫暖共感型', desc: '會照顧人情緒、親和力強', camera: '適合訪談、陪伴感、故事分享' },
+      { val: 'energetic-leader', title: '活力領導型', desc: '表達有感染力、敢下結論', camera: '適合觀點型、激勵型、走動式' },
+      { val: 'calm-professional', title: '沉穩專業型', desc: '說話慢、用詞精準、權威感', camera: '適合信任層內容、深度長片' },
+      { val: 'playful-creative', title: '玩樂創意型', desc: '有趣、愛玩梗、不按牌理', camera: '適合情境劇、互動、娛樂型' },
+      { val: 'introvert-deep', title: '內斂深思型', desc: '不多話但有洞察', camera: '適合旁白、文字+畫面型內容' }
+    ]
+  },
+  {
+    key: 'strength',
+    label: '放大優勢（賣點）',
+    icon: '💎',
+    description: '這個人最值得被放大、變成個人品牌記憶點的特質',
+    options: [
+      { val: 'expertise', title: '專業深度', desc: '產業經驗、證照、實戰案例' },
+      { val: 'storytelling', title: '說故事能力', desc: '把複雜變簡單、用故事包裝' },
+      { val: 'authenticity', title: '真實感', desc: '不包裝、不做作、願意談失敗' },
+      { val: 'insight', title: '獨特觀點', desc: '看事情角度不一樣、敢說反主流' },
+      { val: 'aesthetics', title: '美學品味', desc: '畫面感、穿搭、生活風格' },
+      { val: 'humor', title: '幽默感', desc: '能讓人會心一笑、自嘲能力' },
+      { val: 'energy', title: '情感渲染', desc: '熱情、激勵他人、有感染力' },
+      { val: 'detail', title: '細節講究', desc: '挑剔、追求完美、注重工藝' }
+    ]
+  },
+  {
+    key: 'blindspot',
+    label: '盲點缺陷（要修）',
+    icon: '⚠️',
+    description: '這個人鏡頭前會拖累效果的東西，要在拍攝時克服或迴避',
+    options: [
+      { val: 'jargon', title: '專業術語太多', desc: '觀眾聽不懂' },
+      { val: 'too-long', title: '講話太長太繞', desc: '抓不到重點' },
+      { val: 'monotone', title: '語氣平淡', desc: '沒有起伏、讓人想滑走' },
+      { val: 'camera-shy', title: '鏡頭緊張', desc: '眼神飄、肢體僵硬' },
+      { val: 'self-conscious', title: '過度在意形象', desc: '不敢表達真實想法' },
+      { val: 'too-perfect', title: '太包裝像廣告', desc: '沒有真實感' },
+      { val: 'no-opinion', title: '不敢有立場', desc: '怕得罪人、結論模糊' },
+      { val: 'outdated', title: '表達老派', desc: '跟不上短影音節奏' }
+    ]
+  },
+  {
+    key: 'visibility',
+    label: '願意見光隨',
+    icon: '🌗',
+    description: '這個人願意公開到什麼程度？影響內容的真實度和深度',
+    options: [
+      { val: 'full-open', title: '全面開放', desc: '連家人、失敗、脆弱都可分享', range: '深度故事型、粉絲黏著度高' },
+      { val: 'work-only', title: '只談工作', desc: '專業內容 OK、私人領域保留', range: '專業型 IP、信任層為主' },
+      { val: 'selective', title: '選擇性分享', desc: '興趣愛好可以、家庭不行', range: '生活感 + 專業並存' },
+      { val: 'minimal', title: '極度低調', desc: '只露專業、不露生活', range: '知識型、企業品牌代言人' }
+    ]
+  },
+  {
+    key: 'lifestyle',
+    label: '生活習性',
+    icon: '☕',
+    description: '真實的生活樣貌，用來判斷拍攝場景和可分享素材',
+    options: [
+      { val: 'workaholic', title: '工作狂', desc: '辦公室就是生活，素材以專業場景為主' },
+      { val: 'balanced', title: '生活工作平衡型', desc: '有運動、閱讀、朋友聚會等素材可用' },
+      { val: 'family-oriented', title: '家庭優先型', desc: '有育兒、家庭日常素材，但注意隱私' },
+      { val: 'adventure-seeker', title: '冒險愛好者', desc: '旅遊、戶外、運動素材豐富' },
+      { val: 'homebody', title: '宅居型', desc: '居家、寵物、植栽、手作素材' },
+      { val: 'social-active', title: '社交活躍型', desc: '朋友、餐廳、活動場景多' }
+    ]
+  },
+  {
+    key: 'hobbies',
+    label: '興趣愛好（IP 素材庫）',
+    icon: '🎨',
+    description: '可以融入內容、延伸話題的興趣，讓 IP 有「人味」',
+    multi: true,
+    options: [
+      { val: 'reading', title: '閱讀', icon: '📚' },
+      { val: 'fitness', title: '健身運動', icon: '💪' },
+      { val: 'cooking', title: '料理烘焙', icon: '🍳' },
+      { val: 'travel', title: '旅遊探索', icon: '✈️' },
+      { val: 'art-music', title: '藝文音樂', icon: '🎵' },
+      { val: 'pets', title: '寵物陪伴', icon: '🐾' },
+      { val: 'tech-gadget', title: '科技3C', icon: '📱' },
+      { val: 'fashion', title: '穿搭時尚', icon: '👗' },
+      { val: 'food-gourmet', title: '美食探店', icon: '🍷' },
+      { val: 'gaming', title: '遊戲娛樂', icon: '🎮' },
+      { val: 'meditation', title: '心靈成長', icon: '🧘' },
+      { val: 'crafts', title: '手作DIY', icon: '✂️' },
+      { val: 'investing', title: '投資理財', icon: '💰' },
+      { val: 'social-causes', title: '公益倡議', icon: '🌱' }
+    ]
+  },
+  {
+    key: 'audience-appeal',
+    label: '最能吸引的受眾類型',
+    icon: '🎯',
+    description: '這個人的氣質、表達，最容易打中哪一群人',
+    options: [
+      { val: 'knowledge-seekers', title: '求知型受眾', desc: '愛學習、愛聽專業、收藏率高' },
+      { val: 'emotional-seekers', title: '情感共鳴型', desc: '愛故事、愛療癒、互動率高' },
+      { val: 'action-takers', title: '行動派受眾', desc: '要方法、要步驟、轉化率高' },
+      { val: 'status-seekers', title: '品味追求型', desc: '重美學、重格調、分享率高' },
+      { val: 'skeptical-analytical', title: '理性分析型', desc: '要證據、要邏輯、成交品質高' },
+      { val: 'community-joiners', title: '社群歸屬型', desc: '愛互動、愛圈子、長期黏著度高' }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// 【新增】IP 定位分析引擎 - 產出 IP 獨特賣點
+// ═══════════════════════════════════════════════════════════
+const IP_ARCHETYPES = {
+  'analytical+expertise': { name: '專家權威型', angle: '用數據和專業建立不可動搖的信任感' },
+  'analytical+insight': { name: '洞察思想家', angle: '獨特觀點+邏輯論證，做思想領袖' },
+  'warm-empathic+storytelling': { name: '暖心說書人', angle: '用溫暖故事讓人願意被專業觸動' },
+  'warm-empathic+authenticity': { name: '真實陪伴者', angle: '真誠分享建立死忠粉絲群' },
+  'energetic-leader+energy': { name: '激勵鼓舞型', angle: '用熱情感染受眾採取行動' },
+  'energetic-leader+insight': { name: '觀點戰將', angle: '敢說別人不敢說的話，製造話題' },
+  'calm-professional+expertise': { name: '沉穩大師', angle: '低調的專業，讓人自然信賴' },
+  'calm-professional+detail': { name: '匠人職人', angle: '對細節的堅持就是最好的行銷' },
+  'playful-creative+humor': { name: '娛樂創作者', angle: '用有趣內容降低專業的距離感' },
+  'playful-creative+aesthetics': { name: '美感玩家', angle: '把專業變成一場視覺饗宴' },
+  'introvert-deep+insight': { name: '文字思想家', angle: '不需常露臉，以內容深度取勝' },
+  'introvert-deep+authenticity': { name: '靜水深流型', angle: '安靜的真實，對同溫層有致命吸引力' }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 【新增】受眾深度洞察題組（4個核心問題）
+// ═══════════════════════════════════════════════════════════
+const AUDIENCE_DEEP_QUESTIONS = [
+  {
+    key: 'idealState',
+    label: '理想狀態',
+    icon: '✨',
+    q: '你的目標受眾「最希望變成的樣子」是什麼？',
+    helper: '他們心目中的理想結局 — 這會成為你內容的願景出口',
+    examples: ['不用擔心法律風險，安心經營事業', '皮膚狀況穩定，出門不用化妝遮瑕', '財務自由，不用被工作綁住']
+  },
+  {
+    key: 'deepFear',
+    label: '深層恐懼',
+    icon: '😰',
+    q: '他們「最害怕發生什麼事」？',
+    helper: '比表面痛點更深的恐懼 — 這會是鉤子的情緒引爆點',
+    examples: ['怕老了沒人養、怕錢不夠用', '怕孩子輸在起跑點、怕教養失敗', '怕被資遣後沒競爭力']
+  },
+  {
+    key: 'currentStrength',
+    label: '現有優勢',
+    icon: '💪',
+    q: '這群人「本身就很棒的地方」是什麼？',
+    helper: '用他們的優勢對話，會比直接點痛點更容易打動',
+    examples: ['已經很認真工作、很願意學習', '對家人無私付出、重視關係', '有行動力、肯投資自己']
+  },
+  {
+    key: 'missingLeverage',
+    label: '缺的槓桿',
+    icon: '🔑',
+    q: '他們「還差什麼就能突破」？',
+    helper: '這是最重要的洞察 — 找出他們的「臨門一腳」就能產出真正高轉化的內容',
+    examples: ['缺一個專業的人教正確方法', '缺一套系統化的 SOP', '缺一個敢推他一把的教練']
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// 【新增】受眾應用場景庫（AI推薦用）
+// ═══════════════════════════════════════════════════════════
+const AUDIENCE_APPLICATIONS = {
+  '法律服務': {
+    idealStates: ['不用擔心合約風險，安心簽約', '員工管理有制度不踩雷', '家庭財產傳承清楚不糾紛'],
+    fears: ['員工離職反咬一口', '合約漏洞被對方告', '離婚/遺產分配糾紛上新聞'],
+    strengths: ['願意花錢解決問題', '重視長期關係', '決策前會先諮詢'],
+    leverages: ['缺會用白話解釋的律師', '缺提早預防的觀念', '缺實際案例佐證']
+  },
+  '醫療照護': {
+    idealStates: ['身體長期健康、不擔心復發', '有信任的醫師長期追蹤', '自己就能判斷小狀況'],
+    fears: ['選錯醫師耽誤治療', '被推銷不必要的療程', '看不懂檢查報告被唬'],
+    strengths: ['重視健康、願意投資', '會做功課比較', '重視醫病關係'],
+    leverages: ['缺能好好聽的醫師', '缺專業的衛教內容', '缺可信的第二意見']
+  },
+  '財會金融': {
+    idealStates: ['帳目清楚、節稅到位', '投資有系統不焦慮', '現金流穩定可預測'],
+    fears: ['被國稅局查核、補稅又罰款', '投資踩雷損失慘重', '退休金不夠用'],
+    strengths: ['有穩定收入來源', '願意花時間學習', '重視資產保全'],
+    leverages: ['缺懂產業的專業會計', '缺投資的系統方法', '缺長期財務規劃']
+  },
+  '美妝保養': {
+    idealStates: ['膚況穩定不用厚化妝', '找到適合的保養流程', '有自信素顏見人'],
+    fears: ['越保養越糟、過敏爛臉', '花大錢卻沒效', '老化比同齡快'],
+    strengths: ['願意投資自己', '勇於嘗試新品', '會分享交流'],
+    leverages: ['缺真正了解膚質的專業', '缺有效率的保養方法', '缺真實的效果見證']
+  },
+  '健身運動': {
+    idealStates: ['身材體態理想', '身體有力氣、精神好', '養成運動習慣不痛苦'],
+    fears: ['運動受傷反而更糟', '花錢去健身卻沒進度', '身材回不去年輕樣'],
+    strengths: ['有行動力、願意嘗試', '重視外表和健康', '肯投資時間'],
+    leverages: ['缺真正有效的訓練方法', '缺適合自己體質的教練', '缺持續下去的動力系統']
+  },
+  '房產居家': {
+    idealStates: ['買到增值的夢想宅', '投資有穩定租金收益', '換屋流程無痛'],
+    fears: ['買貴買錯買到瑕疵屋', '被屋主或仲介騙', '貸款負擔太重'],
+    strengths: ['有累積一定資本', '重視生活品質', '對未來有規劃'],
+    leverages: ['缺真的站在他這邊的仲介', '缺看房實戰經驗', '缺議價談判的底氣']
+  },
+  '美容美髮': {
+    idealStates: ['每次換造型都變更好看', '有信任的設計師長期合作', '頭皮頭髮健康'],
+    fears: ['染燙壞頭髮爛掉', '剪出不適合的造型', '被推銷昂貴產品'],
+    strengths: ['願意為外表投資', '重視儀式感', '會推薦朋友'],
+    leverages: ['缺真懂他需求的設計師', '缺居家保養的方法', '缺敢說實話的專業意見']
+  },
+  '醫美整形': {
+    idealStates: ['自然變美不被看出來', '解決長年困擾（黑眼圈、斑）', '進入更好的人生階段'],
+    fears: ['做壞了回不去', '副作用、後遺症', '被當盤子多收錢'],
+    strengths: ['願意為美投資', '謹慎會做功課', '重視醫師專業'],
+    leverages: ['缺真實案例見證', '缺敢說不的醫師', '缺術後真實回饋']
+  },
+  '教育培訓': {
+    idealStates: ['學會後能實際應用變現', '有長期成長方向', '遇到志同道合的同學'],
+    fears: ['學了用不到浪費錢', '選錯老師走冤枉路', '跟不上、被淘汰'],
+    strengths: ['有學習動機', '肯花時間', '重視自我成長'],
+    leverages: ['缺手把手的實戰教學', '缺業界人脈', '缺明確的成長路徑圖']
+  },
+  '_default': {
+    idealStates: ['達到理想的生活/事業狀態', '解決長期困擾的問題', '有信任的專業長期支持'],
+    fears: ['花錢沒效果', '選錯人浪費時間', '問題反覆沒根治'],
+    strengths: ['有行動意願', '願意學習', '重視品質'],
+    leverages: ['缺真正的專業引導', '缺系統化的方法', '缺實際案例參考']
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 【新增】IG 餵養庫分類（整合趨勢雷達結構）
+// ═══════════════════════════════════════════════════════════
+const FEED_CATEGORIES = {
+  platforms: [
+    { key: 'instagram', label: 'Instagram', icon: '📷' },
+    { key: 'tiktok', label: 'TikTok', icon: '🎵' },
+    { key: 'youtube', label: 'YouTube Shorts', icon: '📺' },
+    { key: 'xiaohongshu', label: '小紅書', icon: '📕' },
+    { key: 'facebook', label: 'Facebook', icon: '👥' },
+    { key: 'threads', label: 'Threads', icon: '💬' }
+  ],
+  performance: [
+    { key: 'viral', label: '爆款 (100萬+)', color: '#A51820' },
+    { key: 'hot', label: '熱門 (10-100萬)', color: '#C02030' },
+    { key: 'solid', label: '穩定 (1-10萬)', color: '#7A5A5E' },
+    { key: 'niche', label: '小眾但精準', color: '#2E6B2E' }
+  ],
+  contentType: [
+    { key: 'knowledge', label: '知識型' },
+    { key: 'story', label: '故事型' },
+    { key: 'opinion', label: '觀點型' },
+    { key: 'entertainment', label: '娛樂型' },
+    { key: 'tutorial', label: '教學型' },
+    { key: 'lifestyle', label: '生活型' }
+  ]
+};
+
+</script>
+
+<script id="logicScript">
+// ============================================================
+// 【V2 核心邏輯】
+// ============================================================
+
+// ═══════════════════════════════════════════════════════════
+// 狀態管理
+// ═══════════════════════════════════════════════════════════
+const state = {
+  currentStep: 0,  // 0=歡迎, 1-13=步驟, 14=結果
+  data: {
+    // Stage 1: 客戶基本 + IP 人格 + 受眾
+    clientName: '',
+    industryL1: '',
+    industryL2: '',
+    industryL3: '',
+    clientTypeScale: 3,
+    b2bAnswers: [],
+    b2bResult: '',
+    // 【新】IP 人格 7 維度
+    ipCoreTrait: '',
+    ipStrength: '',
+    ipBlindspot: '',
+    ipVisibility: '',
+    ipLifestyle: '',
+    ipHobbies: [],
+    ipAudienceAppeal: '',
+    // 受眾
+    targetGeneration: '',
+    targetSpending: '',
+    audienceCustom: '',
+    // 【新】受眾深度洞察
+    audIdealState: '',
+    audDeepFear: '',
+    audCurrentStrength: '',
+    audMissingLeverage: '',
+    // 痛點
+    painSelected: [],
+    painCustom: '',
+    // Stage 2: 策略 KPI
+    goalSelected: [],
+    tempGoalLayer: '',
+    // Stage 3: 腳本生成
+    hookTypes: [],
+    middleStructure: '',
+    ctaStrength: '',
+    shotStyle: '',
+    videoLength: '',
+    // 最終 10 個腳本
+    generatedScripts: [],
+    selectedScripts: [],
+    // 【新】餵養庫資料（從 localStorage 載入）
+    feedItems: []
+  }
+};
+
+const $ = id => document.getElementById(id);
+
+// ═══════════════════════════════════════════════════════════
+// AI 智慧分析引擎（模擬真 AI 的邏輯判斷）
+// ═══════════════════════════════════════════════════════════
+const AI = {
+  // 【新】判斷 IP 原型
+  detectIpArchetype(data) {
+    const key = `${data.ipCoreTrait}+${data.ipStrength}`;
+    if (IP_ARCHETYPES[key]) return IP_ARCHETYPES[key];
+    // Fallback 邏輯
+    const fallbacks = {
+      'analytical': { name: '理性型 IP', angle: '用專業和邏輯建立權威' },
+      'warm-empathic': { name: '溫暖型 IP', angle: '用真誠和共感建立連結' },
+      'energetic-leader': { name: '領導型 IP', angle: '用熱情和觀點影響他人' },
+      'calm-professional': { name: '專業型 IP', angle: '用沉穩和品質累積信任' },
+      'playful-creative': { name: '創意型 IP', angle: '用趣味降低距離感' },
+      'introvert-deep': { name: '深度型 IP', angle: '以內容深度取勝，不靠露臉' }
+    };
+    return fallbacks[data.ipCoreTrait] || { name: '待定型', angle: '需更多資訊分析' };
+  },
+
+  // 【新】受眾深度推薦
+  recommendAudienceInsights(data) {
+    const industryKey = data.industryL2;
+    let app = AUDIENCE_APPLICATIONS[industryKey];
+    if (!app) {
+      for (const key of Object.keys(AUDIENCE_APPLICATIONS)) {
+        if (industryKey && industryKey.includes(key.substring(0, 2))) {
+          app = AUDIENCE_APPLICATIONS[key];
+          break;
+        }
+      }
+    }
+    return app || AUDIENCE_APPLICATIONS['_default'];
+  },
+
+  // 判斷 B2B / B2C
+  detectBusinessType(answers) {
+    if (!answers || answers.length < 3) return '';
+    const counts = { b2b: 0, b2c: 0, mixed: 0, mid: 0, both: 0 };
+    answers.forEach(a => counts[a] = (counts[a] || 0) + 1);
+    if (counts.b2b >= 2) return 'B2B';
+    if (counts.b2c >= 2) return 'B2C';
+    if (counts.both > 0 || counts.mixed > 0 || (counts.b2b > 0 && counts.b2c > 0)) return 'B2B2C（雙棲）';
+    if (counts.mid > 0) return 'B2C 升級版（中高客單）';
+    return 'B2C';
+  },
+
+  // 依客戶資料推薦目標層
+  recommendGoalLayer(data) {
+    const scale = data.clientTypeScale;
+    const industry = data.industryL2;
+    const biz = data.b2bResult;
+
+    // 邏輯：個人品牌 → 品牌/信任；企業 → 看產業
+    if (scale <= 2) {
+      return { primary: 'brand', reason: '個人型客戶優先建立 IP 和信任感' };
+    }
+    if (scale === 3) {
+      if (biz.includes('B2B')) {
+        return { primary: 'trust', reason: '中小型 B2B 核心在於信任建立，才有詢問轉化' };
+      }
+      return { primary: 'trust', reason: '中小團隊建議先建立專業信任，再推轉化' };
+    }
+    if (scale >= 4) {
+      return { primary: 'conversion', reason: '中大型組織重點在於實際業績轉化和ROI' };
+    }
+    return { primary: 'trust', reason: '信任層是大多數客戶的共同優先' };
+  },
+
+  // 推薦 KPI 分配比例
+  recommendGoalMix(data) {
+    const layer = this.recommendGoalLayer(data).primary;
+    const mixes = {
+      'cognition': [
+        { id: '01', percent: 50 }, { id: '02', percent: 30 }, { id: '03', percent: 20 }
+      ],
+      'brand': [
+        { id: '03', percent: 50 }, { id: '04', percent: 30 }, { id: '05', percent: 20 }
+      ],
+      'trust': [
+        { id: '05', percent: 60 }, { id: '04', percent: 20 }, { id: '06', percent: 20 }
+      ],
+      'conversion': [
+        { id: '06', percent: 40 }, { id: '08', percent: 30 }, { id: '05', percent: 30 }
+      ]
+    };
+    return mixes[layer] || mixes['trust'];
+  },
+
+  // 依世代推薦平台和鉤子風格
+  generationInsight(generation) {
+    const g = GENERATIONS[generation];
+    if (!g) return '';
+    return `${g.name}主要在 ${g.platform} 活動。${g.traits}。${g.buying}。`;
+  },
+
+  // 檢測 KPI 衝突
+  detectKpiConflict(goals, videoLength, ctaStrength) {
+    const conflicts = [];
+    const hasStrongCta = ctaStrength === 'strong';
+    const wantCompletion = goals.some(g => ['04','05'].includes(g.id));
+    const isLong = ['60','90'].includes(videoLength);
+
+    if (wantCompletion && hasStrongCta) {
+      conflicts.push('⚠️ 你想衝完播率，但選了強 CTA — 強 CTA 會讓用戶提前滑走。建議改中等 CTA 或不設 CTA。');
+    }
+    if (isLong && goals.some(g => g.id === '01')) {
+      conflicts.push('⚠️ 你選了曝光目標但影片偏長 — 60+秒影片完播率通常低於 30%，觸及會受影響。建議改 15-30 秒。');
+    }
+    return conflicts;
+  },
+
+  // 核心：依選擇生成 10 個腳本變體
+  generateScripts(data) {
+    const scripts = [];
+    const industryName = data.industryL3 || data.industryL2 || '這個領域';
+    const audience = this.buildAudienceLabel(data);
+    const pain = this.buildPainText(data);
+    const ctaStrength = data.ctaStrength || 'medium';
+    
+    // 【新】從餵養庫抓取相關靈感
+    const feedInspirations = (typeof feedManager !== 'undefined') 
+      ? feedManager.getRelevantInspirations(null, 5) 
+      : [];
+    
+    // 取所有可用鉤子類型
+    const goalIds = data.goalSelected.map(g => g.id);
+    const availableHooks = data.hookTypes.length > 0 
+      ? data.hookTypes 
+      : [...new Set(goalIds.flatMap(id => GOAL_HOOK_MAP[id] || []))];
+    
+    const hooks = availableHooks.length > 0 ? availableHooks : Object.keys(HOOK_TYPES).slice(0, 5);
+    
+    // 生成 10 個變體
+    for (let i = 0; i < 10; i++) {
+      const hookKey = hooks[i % hooks.length];
+      const hook = HOOK_TYPES[hookKey];
+      
+      // 【新】每 3 個腳本用一個餵養庫靈感
+      let hookLine;
+      let feedSource = null;
+      if (feedInspirations.length > 0 && i % 3 === 0) {
+        // 用餵養庫的鉤子當基底，結合客戶痛點
+        const insp = feedInspirations[Math.floor(i / 3) % feedInspirations.length];
+        hookLine = this.adaptFeedHook(insp.hookText, { industryName, audience, pain, data });
+        feedSource = insp;
+      } else {
+        hookLine = this.generateHookLine(hook, i, { industryName, audience, pain, data });
+      }
+      
+      // 中段結構
+      const middleKey = data.middleStructure || Object.keys(MIDDLE_STRUCTURES)[i % 9];
+      const middle = MIDDLE_STRUCTURES[middleKey];
+      
+      // CTA
+      const ctaTemplates = CTA_LIBRARY[ctaStrength]?.templates || CTA_LIBRARY.medium.templates;
+      const cta = ctaTemplates[i % ctaTemplates.length];
+      
+      // 運鏡
+      const shot = SHOT_STYLES[data.shotStyle] || SHOT_STYLES['talking-head'];
+      
+      // 影片長度
+      const length = VIDEO_LENGTHS[data.videoLength] || VIDEO_LENGTHS['30'];
+      
+      // 為每個目標輪流分配
+      const mainGoal = data.goalSelected[i % data.goalSelected.length];
+      const goalInfo = GOALS[mainGoal.id];
+      
+      scripts.push({
+        id: i + 1,
+        title: `腳本 ${String(i + 1).padStart(2, '0')}｜${hook.name}${feedSource ? ' ✦' : ''}`,
+        subtitle: feedSource ? `靈感來源：${FEED_CATEGORIES.platforms.find(p => p.key === feedSource.platform)?.label || ''} 爆款` : `主打：${goalInfo.name}`,
+        hookType: hook.name,
+        hookCategory: hook.category,
+        hookLine,
+        feedSource,
+        middle: this.generateMiddleContent(middle, { industryName, audience, pain, goal: goalInfo, data }),
+        middleStructure: middle.name,
+        cta,
+        ctaStrength: CTA_LIBRARY[ctaStrength]?.name || '中等 CTA',
+        shotStyle: shot.name,
+        shotNote: this.generateShotNote(shot, middle),
+        length: length.name,
+        lengthSec: parseInt(data.videoLength) || 30,
+        goal: goalInfo,
+        designRationale: this.generateRationale(hook, middle, goalInfo, data, feedSource)
+      });
+    }
+    return scripts;
+  },
+  
+  // 【新】改寫餵養庫的鉤子來貼合客戶痛點
+  adaptFeedHook(feedHook, ctx) {
+    // 簡易改寫：保留結構，換關鍵字
+    const { industryName, pain, data } = ctx;
+    const painShort = pain.substring(0, 25);
+    
+    // 如果鉤子包含「我」「你」等主語，保留；其他關鍵字替換
+    let adapted = feedHook;
+    
+    // 嘗試把通用詞替換成客戶相關
+    const replaceMap = [
+      [/這個行業/g, industryName],
+      [/這個領域/g, industryName],
+      [/我們/g, industryName + '的人'],
+    ];
+    replaceMap.forEach(([from, to]) => {
+      adapted = adapted.replace(from, to);
+    });
+    
+    // 如果鉤子很短，加一個痛點補充
+    if (adapted.length < 15 && painShort) {
+      adapted += `——特別如果你遇過${painShort}`;
+    }
+    
+    return adapted;
+  },
+
+  buildAudienceLabel(data) {
+    const gen = GENERATIONS[data.targetGeneration];
+    const spending = SPENDING_LEVELS[data.targetSpending];
+    const custom = data.audienceCustom;
+    const parts = [];
+    if (gen) parts.push(gen.name);
+    if (spending) parts.push(spending.name);
+    if (custom) parts.push(custom);
+    return parts.join('｜') || '目標受眾';
+  },
+
+  buildPainText(data) {
+    const pains = [];
+    if (data.painSelected?.length > 0) pains.push(...data.painSelected);
+    if (data.painCustom) pains.push(data.painCustom);
+    return pains[0] || '這個問題'; // 主要痛點
+  },
+
+  generateHookLine(hook, variantIndex, ctx) {
+    const { industryName, audience, pain, data } = ctx;
+    const patterns = hook.patterns;
+    const pattern = patterns[variantIndex % patterns.length];
+    
+    // 替換變數
+    const painShort = pain.substring(0, 25);
+    const audienceShort = audience.split('｜')[0] || '目標族群';
+    const topic = industryName;
+    
+    const replacements = {
+      '{number}': ['3', '5', '7', '10'][variantIndex % 4],
+      '{audience}': audienceShort,
+      '{industry}': industryName,
+      '{pain}': painShort,
+      '{topic}': topic,
+      '{money}': ['10萬', '30萬', '50萬', '100萬'][variantIndex % 4],
+      '{time}': ['3分鐘', '5分鐘', '1小時'][variantIndex % 3],
+      '{years}': ['3', '5', '10'][variantIndex % 3],
+      '{benefit1}': '省時間',
+      '{benefit2}': '省成本',
+      '{benefit3}': '見效果',
+      '{benefit}': '達到目標',
+      '{result}': '看見成果',
+      '{low_cost}': '一點時間',
+      '{high_value}': '專業結果',
+      '{pain_thing}': '走冤枉路',
+      '{situation}': `面對 ${painShort}`,
+      '{action}': '開始行動',
+      '{wrong_belief}': `${painShort}沒辦法解決`,
+      '{wrong_action}': `還在用舊方法處理 ${painShort}`,
+      '{common_belief}': `大家都在說的「${industryName}常識」`,
+      '{wrong_way}': '錯誤的做法',
+      '{right_way}': '正確的做法',
+      '{skill}': `${industryName}的關鍵技巧`
+    };
+    
+    let line = pattern;
+    Object.entries(replacements).forEach(([key, val]) => {
+      line = line.replaceAll(key, val);
+    });
+    return line;
+  },
+
+  generateMiddleContent(middle, ctx) {
+    const { industryName, goal, data } = ctx;
+    const painShort = ctx.pain.substring(0, 25);
+    
+    // 依據結構產生對應內容
+    return middle.structure.map((step, idx) => {
+      let detail = step;
+      if (step.includes('提問')) detail = `提問：${painShort}你遇過嗎？`;
+      else if (step.includes('原因') || step.includes('為什麼')) detail = `說明根本原因（從${industryName}專業角度）`;
+      else if (step.includes('方法') || step.includes('步驟')) detail = `提供可執行的方法（${idx + 1} 個具體做法）`;
+      else if (step.includes('重點') || step.includes('結論')) detail = `重申最重要的一句話，加深記憶`;
+      else if (step.includes('主角') || step.includes('背景')) detail = `介紹客戶背景（可匿名，講產業和問題）`;
+      else if (step.includes('衝突') || step.includes('問題')) detail = `他遇到什麼問題？為什麼難解決？`;
+      else if (step.includes('轉折')) detail = `關鍵轉折：你介入後做了什麼不一樣的事`;
+      else if (step.includes('結果') || step.includes('成果')) detail = `最後得到什麼成果？帶出你的專業價值`;
+      else if (step.includes('立場')) detail = `我認為：${goal.name.includes('信任') ? '專業服務不能只看價格' : '這個做法才是對的'}`;
+      else if (step.includes('理由')) detail = `支持論據 ${idx}：從案例或數據佐證`;
+      else if (step.includes('反方')) detail = `有人會說：這樣太理想化了`;
+      else if (step.includes('回應')) detail = `但實際上，依我 N 年經驗，這樣做最有效`;
+      
+      return `【${step}】${detail}`;
+    });
+  },
+
+  generateShotNote(shot, middle) {
+    const baseNotes = {
+      'sit-interview': '穩定正面特寫，重點處切特寫手勢',
+      'walk-dynamic': '邊走邊說，背景切換 2-3 個場景',
+      'multi-scene': `依${middle.name}切換 3 個以上場景，動態豐富`,
+      'visual-cards': '每個重點配一張大字卡，強化記憶',
+      'demo-action': '實際動手示範，中景半身 + 特寫交替',
+      'talking-head': '直視鏡頭像聊天，搭配輕微手勢',
+      'doc-style': '旁白+B-roll，畫面不能只有講話鏡頭',
+      'interactive': '對話/反應鏡頭，打破第四面牆'
+    };
+    return baseNotes[shot.name] || '中景半身，搭配適當手勢';
+  },
+
+  generateRationale(hook, middle, goal, data, feedSource = null) {
+    const parts = [];
+    if (feedSource) {
+      parts.push(`✦ 這條腳本參考了你餵養庫中的爆款靈感（${FEED_CATEGORIES.platforms.find(p => p.key === feedSource.platform)?.label}）`);
+    }
+    parts.push(`鉤子「${hook.name}」屬於${hook.category}類，適合${hook.use}`);
+    parts.push(`中段用「${middle.name}」是因為 ${middle.desc}`);
+    parts.push(`主打目標「${goal.name}」的核心 KPI 是 ${goal.kpi.slice(0, 2).join('、')}`);
+    if (data.audDeepFear) {
+      parts.push(`鉤子刻意切入深層恐懼「${data.audDeepFear}」以觸發情緒`);
+    }
+    return parts.join('；');
+  },
+
+  // 拍攝 notes（依整體資料）
+  generateShootingNotes(data, scripts) {
+    const notes = [];
+    const mainGoal = data.goalSelected[0];
+    const g = GOALS[mainGoal.id];
+    const length = VIDEO_LENGTHS[data.videoLength];
+    
+    notes.push(`影片長度控制在 ${length.name}；60秒以上務必靠前3秒拉人`);
+    
+    if (g.layer === 'trust') {
+      notes.push(`信任型：目標完播率 40%+、收藏率 5%+`);
+      notes.push(`以專業知識為主，避免過度行銷語言`);
+    }
+    if (g.layer === 'conversion') {
+      notes.push(`轉化型：CTA 放在最後 5-10 秒，且主頁連結要備好`);
+      notes.push(`可搭配限時優惠或名額限制增加轉化`);
+    }
+    if (data.targetGeneration === 'boomer' || data.targetGeneration === 'gen-x') {
+      notes.push(`${GENERATIONS[data.targetGeneration].name}受眾：避免太多網路流行語，語調穩定`);
+    }
+    if (data.targetGeneration === 'gen-z') {
+      notes.push(`Z世代受眾：節奏要快、要真實、避免過度包裝的商業感`);
+    }
+    if (data.industryL2 && (data.industryL2.includes('醫療') || data.industryL2.includes('法律') || data.industryL2.includes('醫美'))) {
+      notes.push(`⚠️ ${data.industryL2}內容：務必遵守台灣法規，避免絕對性療效/勝訴承諾`);
+    }
+    notes.push(`發布後 30 分鐘主動回覆留言，觸發演算法推播`);
+    notes.push(`同批拍 10 支腳本可節省時間，但服裝、場景、情緒要保持變化感`);
+    
+    return notes;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 渲染主函式
+// ═══════════════════════════════════════════════════════════
+function render() {
+  const content = $('mainContent');
+  if (state.currentStep === 0) {
+    $('progressWrap').classList.add('hidden');
+    $('navBar').classList.add('hidden');
+    content.innerHTML = renderWelcome();
+    bindWelcome();
+  } else if (state.currentStep === 14) {
+    $('progressWrap').classList.add('hidden');
+    $('navBar').classList.add('hidden');
+    content.innerHTML = renderResult();
+    bindResult();
+  } else {
+    $('progressWrap').classList.remove('hidden');
+    $('navBar').classList.remove('hidden');
+    content.innerHTML = renderStep(state.currentStep);
+    updateProgress();
+    updateNav();
+    bindStep(state.currentStep);
+  }
+}
+
+function renderWelcome() {
+  return `
+    <div class="welcome-screen screen">
+      <div class="brand-mark">SCRIPT GENERATOR V3</div>
+      <h1>IP 人格洞察 ×<span> 10 組腳本 </span>×<br>靈感餵養系統</h1>
+      <p class="lead">
+        13 步深度流程：客戶基本資料 × IP 人格 7 維度 × 受眾內外洞察<br>
+        每一步都有 AI 分析與建議，最終產出 10 組完整腳本
+      </p>
+      <div class="feature-row">
+        <div class="feature-box">
+          <span class="icon">🧬</span>
+          <div class="title">IP 人格 7 維度</div>
+          <div class="desc">核心性格、優勢、盲點、生活習性⋯深度洞察客戶</div>
+        </div>
+        <div class="feature-box">
+          <span class="icon">🎯</span>
+          <div class="title">受眾內外洞察</div>
+          <div class="desc">理想狀態、深層恐懼、缺的槓桿——靈魂級洞察</div>
+        </div>
+        <div class="feature-box">
+          <span class="icon">📚</span>
+          <div class="title">靈感餵養庫</div>
+          <div class="desc">看到爆款就存，AI 產腳本時自動參考</div>
+        </div>
+        <div class="feature-box">
+          <span class="icon">🎬</span>
+          <div class="title">10 組腳本 + 簡報</div>
+          <div class="desc">可單獨複製、混搭、匯出 PPT 簡報版</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="startBtn" style="padding:16px 48px;font-size:16px;">
+        開始製作腳本 →
+      </button>
+      <p style="margin-top:16px;font-size:12px;color:var(--text-muted);">
+        💡 點擊右下角 📚 按鈕隨時打開靈感餵養庫
+      </p>
+    </div>
+  `;
+}
+
+function bindWelcome() {
+  $('startBtn').addEventListener('click', () => {
+    state.currentStep = 1;
+    render();
+  });
+}
+
+function renderStep(step) {
+  const renderers = {
+    1: renderStep1,   // 客戶基本資料
+    2: renderStep2,   // 客戶類型量表
+    3: renderStep3,   // B2B/B2C 智慧判斷
+    4: renderStepIpCore,       // 【新】IP 核心性格
+    5: renderStepIpStrength,   // 【新】IP 優勢 × 盲點
+    6: renderStepIpLifestyle,  // 【新】IP 生活習性 × 見光隨 × 興趣
+    7: renderStep4,   // 世代 × 消費力
+    8: renderStepAudDeep,      // 【新】受眾深度洞察 + 痛點
+    9: renderStep6,   // KPI 層選擇
+    10: renderStep7,  // KPI 分配
+    11: renderStep8,  // 鉤子類型
+    12: renderStep9,  // 中段 + CTA
+    13: renderStep10  // 運鏡 + 長度
+  };
+  return `<div class="container screen">${renderers[step]()}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Stage 1: 客戶 × 受眾定位（5步）
+// ═══════════════════════════════════════════════════════════
+function renderStep1() {
+  const l1Options = Object.keys(INDUSTRY_TREE);
+  const l2Options = state.data.industryL1 ? Object.keys(INDUSTRY_TREE[state.data.industryL1]) : [];
+  const l3Options = (state.data.industryL1 && state.data.industryL2) 
+    ? INDUSTRY_TREE[state.data.industryL1][state.data.industryL2] : [];
+  
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · 客戶基本資料</span>
+      <h1 class="step-title">客戶基本資料</h1>
+      <p class="step-subtitle">三層產業分類基於國際產業標準（GICS + ISIC 改良），精準定位更容易</p>
+    </div>
+    <div class="input-group">
+      <label class="input-label">客戶名稱 / 品牌名稱</label>
+      <input type="text" class="text-input" id="clientName" 
+        value="${state.data.clientName}" 
+        placeholder="例：理鴻法律事務所、陳醫師、喜躍生醫">
+    </div>
+    <div class="input-group">
+      <label class="input-label">產業分類（三層）</label>
+      <p class="input-helper">從大類 → 中類 → 小類，越精準越能產出客製化鉤子和痛點</p>
+      <div class="cascading-selects">
+        <select class="select-input" id="industryL1">
+          <option value="">選擇大類</option>
+          ${l1Options.map(o => `<option value="${o}" ${state.data.industryL1 === o ? 'selected' : ''}>${o}</option>`).join('')}
+        </select>
+        <select class="select-input" id="industryL2" ${!state.data.industryL1 ? 'disabled' : ''}>
+          <option value="">選擇中類</option>
+          ${l2Options.map(o => `<option value="${o}" ${state.data.industryL2 === o ? 'selected' : ''}>${o}</option>`).join('')}
+        </select>
+        <select class="select-input" id="industryL3" ${!state.data.industryL2 ? 'disabled' : ''}>
+          <option value="">選擇小類</option>
+          ${l3Options.map(o => `<option value="${o}" ${state.data.industryL3 === o ? 'selected' : ''}>${o}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${state.data.industryL2 ? `
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 產業洞察</div>
+      <div class="ai-insight-text">
+        你選的是「<strong>${state.data.industryL2}</strong>」類別，這個產業的短影音競爭中等偏高。
+        後續痛點庫、鉤子推薦、CTA建議都會根據這個類別客製化。
+      </div>
+    </div>
+    ` : ''}
+  `;
+}
+
+function renderStep2() {
+  const currentScale = state.data.clientTypeScale || 3;
+  const current = CLIENT_TYPE_SCALE[currentScale];
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · 客戶基本資料</span>
+      <h1 class="step-title">客戶屬於哪種組織型態？</h1>
+      <p class="step-subtitle">不用硬分「個人」或「企業」，用量表更精準（例如律師事務所7-8人 = 等級3）</p>
+    </div>
+    <div class="scale-group">
+      <div class="scale-label">
+        <span>純個人</span>
+        <span>大型企業</span>
+      </div>
+      <input type="range" min="1" max="5" value="${currentScale}" class="scale-slider" id="clientTypeScale">
+      <div class="scale-ends">
+        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+      </div>
+      <div class="scale-current-value" id="scaleDisplay">
+        ${current.emoji} 等級 ${currentScale}：${current.name} — ${current.desc}
+      </div>
+    </div>
+    ${currentScale <= 2 ? `
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 判斷</div>
+      <div class="ai-insight-text">
+        個人型客戶，<strong>後續會優先推薦「品牌層」和「信任層」目標</strong>，
+        因為個人品牌最重要的是建立 IP 和累積信任粉絲。
+      </div>
+    </div>` : currentScale === 3 ? `
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 判斷</div>
+      <div class="ai-insight-text">
+        中小型團隊，<strong>創辦人 IP 仍是核心但已有品牌雛形</strong>，
+        後續會推薦「信任層」為主、搭配「轉化層」的組合策略。
+      </div>
+    </div>` : `
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 判斷</div>
+      <div class="ai-insight-text">
+        中大型組織，<strong>品牌大於個人</strong>，
+        後續會推薦「轉化層」和「組織層」，重點在實際業績和招募合作。
+      </div>
+    </div>`}
+  `;
+}
+
+function renderStep3() {
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · 客戶基本資料</span>
+      <h1 class="step-title">B2B 還是 B2C？（AI 引導判斷）</h1>
+      <p class="step-subtitle">不用自己判斷，回答 3 題系統會給你答案</p>
+    </div>
+    ${B2B_B2C_QUESTIONS.map((q, i) => `
+      <div class="input-group">
+        <label class="input-label">問題 ${i + 1}：${q.q}</label>
+        <div class="options-grid cols-3">
+          ${q.options.map(o => `
+            <div class="option-card ${state.data.b2bAnswers[i] === o.val ? 'selected' : ''}"
+                 data-b2b-idx="${i}" data-b2b-val="${o.val}">
+              <div class="option-title" style="font-size:15px;">${o.label}</div>
+              <div class="option-desc">${o.desc}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+    ${state.data.b2bAnswers.length === 3 ? (() => {
+      const result = AI.detectBusinessType(state.data.b2bAnswers);
+      state.data.b2bResult = result;
+      return `
+        <div class="ai-analysis-card">
+          <div class="ai-label">AI 綜合判斷</div>
+          <div class="ai-insight-text">
+            根據你的回答，這位客戶屬於 <strong>${result}</strong> 類型。
+            <br>${result.includes('B2B') ? '說話要更專業、數據導向、強調決策者關心的 ROI。' : 
+                result.includes('B2C') ? '說話要更生活化、情感導向、強調立即感受。' : 
+                result.includes('B2B2C') ? '兩種語言都要會切換，腳本可以同時做兩個版本。' : 
+                '建議以 B2C 為主軸，但專業內容比一般 B2C 更深。'}
+          </div>
+        </div>
+      `;
+    })() : ''}
+  `;
+}
+
+function renderStep4() {
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · 受眾畫像</span>
+      <h1 class="step-title">目標受眾是誰？</h1>
+      <p class="step-subtitle">用世代分析法，連平台和說話方式都會幫你推薦</p>
+    </div>
+    <div class="input-group">
+      <label class="input-label">世代區間（選一個主要受眾）</label>
+      <p class="input-helper">不同世代在不同平台、用不同語言消費內容</p>
+      <div class="options-grid cols-3">
+        ${Object.entries(GENERATIONS).map(([key, g]) => `
+          <div class="option-card ${state.data.targetGeneration === key ? 'selected' : ''}"
+               data-key="targetGeneration" data-val="${key}">
+            <span class="option-emoji">${g.emoji}</span>
+            <div class="option-title">${g.name}</div>
+            <div class="option-desc">${g.age}</div>
+            <div class="option-meta">📱 ${g.platform}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">消費能力層級</label>
+      <div class="options-grid cols-4">
+        ${Object.entries(SPENDING_LEVELS).map(([key, s]) => `
+          <div class="option-card ${state.data.targetSpending === key ? 'selected' : ''}"
+               data-key="targetSpending" data-val="${key}">
+            <span class="option-emoji">${s.emoji}</span>
+            <div class="option-title">${s.name}</div>
+            <div class="option-desc">${s.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">職業 / 身份（自選補充）</label>
+      <p class="input-helper">例：中小企業主、新手爸媽、想轉職的上班族</p>
+      <input type="text" class="text-input" id="audienceCustom" 
+        value="${state.data.audienceCustom}" 
+        placeholder="可選填，讓腳本更精準">
+    </div>
+    ${state.data.targetGeneration ? `
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 世代洞察</div>
+      <div class="ai-insight-text">
+        ${AI.generationInsight(state.data.targetGeneration)}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 【新】Step 4: IP 核心性格
+// ═══════════════════════════════════════════════════════════
+function renderStepIpCore() {
+  const dim = IP_PERSONALITY_DIMENSIONS[0]; // coreTrait
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · IP 人格洞察</span>
+      <h1 class="step-title">${dim.icon} 客戶的核心性格</h1>
+      <p class="step-subtitle">${dim.description}</p>
+    </div>
+    <div class="info-box">
+      🔒 <strong>內部使用工具</strong>：這一區是幫你「洞察客戶」用的，不會對外顯示給客戶看。
+      越精準的人格洞察，越能產出對的腳本。
+    </div>
+    <div class="options-grid cols-2">
+      ${dim.options.map(o => `
+        <div class="option-card ${state.data.ipCoreTrait === o.val ? 'selected' : ''}"
+             data-key="ipCoreTrait" data-val="${o.val}">
+          <div class="option-title">${o.title}</div>
+          <div class="option-desc">${o.desc}</div>
+          <div class="option-meta">📸 ${o.camera}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${state.data.ipCoreTrait ? `
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 洞察</div>
+      <div class="ai-insight-text">
+        選到「<strong>${dim.options.find(o => o.val === state.data.ipCoreTrait).title}</strong>」的客戶，
+        接下來要放大他的優勢、修正他的鏡頭盲點。
+        下一步會幫你找出他的賣點與缺陷。
+      </div>
+    </div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 【新】Step 5: IP 優勢 + 盲點 + 見光隨
+// ═══════════════════════════════════════════════════════════
+function renderStepIpStrength() {
+  const strength = IP_PERSONALITY_DIMENSIONS[1];
+  const blindspot = IP_PERSONALITY_DIMENSIONS[2];
+  const visibility = IP_PERSONALITY_DIMENSIONS[3];
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · IP 人格洞察</span>
+      <h1 class="step-title">💎 放大優勢 × ⚠️ 克服盲點 × 🌗 見光隨</h1>
+      <p class="step-subtitle">找出可以做槓桿的賣點、和拍攝時要處理的問題</p>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">${strength.icon} ${strength.label}</label>
+      <p class="input-helper">${strength.description}</p>
+      <div class="options-grid cols-4">
+        ${strength.options.map(o => `
+          <div class="option-card ${state.data.ipStrength === o.val ? 'selected' : ''}"
+               data-key="ipStrength" data-val="${o.val}">
+            <div class="option-title" style="font-size:15px;">${o.title}</div>
+            <div class="option-desc">${o.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">${blindspot.icon} ${blindspot.label}</label>
+      <p class="input-helper">${blindspot.description}</p>
+      <div class="options-grid cols-4">
+        ${blindspot.options.map(o => `
+          <div class="option-card ${state.data.ipBlindspot === o.val ? 'selected' : ''}"
+               data-key="ipBlindspot" data-val="${o.val}">
+            <div class="option-title" style="font-size:15px;">${o.title}</div>
+            <div class="option-desc">${o.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">${visibility.icon} ${visibility.label}</label>
+      <p class="input-helper">${visibility.description}</p>
+      <div class="options-grid cols-2">
+        ${visibility.options.map(o => `
+          <div class="option-card ${state.data.ipVisibility === o.val ? 'selected' : ''}"
+               data-key="ipVisibility" data-val="${o.val}">
+            <div class="option-title">${o.title}</div>
+            <div class="option-desc">${o.desc}</div>
+            <div class="option-meta">📊 ${o.range}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    ${state.data.ipCoreTrait && state.data.ipStrength ? (() => {
+      const arch = AI.detectIpArchetype(state.data);
+      return `
+        <div class="ai-analysis-card">
+          <div class="ai-label">AI 判斷：IP 原型</div>
+          <div class="ai-insight-text">
+            根據「核心性格 × 優勢」組合，這位客戶的 IP 原型是：<br>
+            <strong style="font-size:18px;">${arch.name}</strong><br>
+            <strong>最佳發展角度：</strong>${arch.angle}
+          </div>
+        </div>
+      `;
+    })() : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 【新】Step 6: IP 生活習性 + 興趣愛好 + 吸引受眾
+// ═══════════════════════════════════════════════════════════
+function renderStepIpLifestyle() {
+  const lifestyle = IP_PERSONALITY_DIMENSIONS[4];
+  const hobbies = IP_PERSONALITY_DIMENSIONS[5];
+  const appeal = IP_PERSONALITY_DIMENSIONS[6];
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · IP 人格洞察</span>
+      <h1 class="step-title">☕ 生活習性 × 🎨 興趣愛好 × 🎯 受眾吸引力</h1>
+      <p class="step-subtitle">拍攝素材來自生活，興趣讓 IP 有「人味」</p>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">${lifestyle.icon} ${lifestyle.label}</label>
+      <p class="input-helper">${lifestyle.description}</p>
+      <div class="options-grid cols-3">
+        ${lifestyle.options.map(o => `
+          <div class="option-card ${state.data.ipLifestyle === o.val ? 'selected' : ''}"
+               data-key="ipLifestyle" data-val="${o.val}">
+            <div class="option-title" style="font-size:15px;">${o.title}</div>
+            <div class="option-desc">${o.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">${hobbies.icon} ${hobbies.label}（可複選 2-5 個）</label>
+      <p class="input-helper">${hobbies.description}</p>
+      <div class="options-grid cols-4">
+        ${hobbies.options.map(o => `
+          <div class="option-card ${state.data.ipHobbies.includes(o.val) ? 'selected' : ''}"
+               data-hobby-toggle="${o.val}">
+            <span class="option-emoji">${o.icon}</span>
+            <div class="option-title" style="font-size:14px;">${o.title}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">${appeal.icon} ${appeal.label}</label>
+      <p class="input-helper">${appeal.description}</p>
+      <div class="options-grid cols-3">
+        ${appeal.options.map(o => `
+          <div class="option-card ${state.data.ipAudienceAppeal === o.val ? 'selected' : ''}"
+               data-key="ipAudienceAppeal" data-val="${o.val}">
+            <div class="option-title" style="font-size:15px;">${o.title}</div>
+            <div class="option-desc">${o.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    ${state.data.ipHobbies.length > 0 && state.data.ipLifestyle ? `
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 素材庫建議</div>
+      <div class="ai-insight-text">
+        客戶選了 <strong>${state.data.ipHobbies.length}</strong> 個興趣愛好，
+        可以設計「主專業 + 延伸興趣」的雙線內容。
+        例如：70% 做本業、30% 融入興趣建立立體感。
+        這是建立「有記憶點 IP」的關鍵。
+      </div>
+    </div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 【新】Step 8: 受眾深度洞察 + 痛點
+// ═══════════════════════════════════════════════════════════
+function renderStepAudDeep() {
+  const app = AI.recommendAudienceInsights(state.data);
+  const industryKey = state.data.industryL2;
+  let pains = INDUSTRY_PAIN_POINTS[industryKey];
+  if (!pains) {
+    for (const key of Object.keys(INDUSTRY_PAIN_POINTS)) {
+      if (industryKey && industryKey.includes(key.substring(0, 2))) {
+        pains = INDUSTRY_PAIN_POINTS[key];
+        break;
+      }
+    }
+  }
+  pains = pains || INDUSTRY_PAIN_POINTS['_default'];
+
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 1 · 受眾深度洞察</span>
+      <h1 class="step-title">洞察受眾的「內外狀態」</h1>
+      <p class="step-subtitle">AI 會先推薦答案，你可以手動調整到最貼近實況</p>
+    </div>
+    <div class="info-box">
+      💡 <strong>這是腳本的靈魂</strong>：理想狀態成為「願景」、深層恐懼成為「鉤子」、
+      現有優勢成為「對話方式」、缺的槓桿成為「你能提供的價值」。
+    </div>
+
+    ${AUDIENCE_DEEP_QUESTIONS.map((q, i) => {
+      const currentVal = state.data[q.key === 'idealState' ? 'audIdealState' : 
+                                    q.key === 'deepFear' ? 'audDeepFear' :
+                                    q.key === 'currentStrength' ? 'audCurrentStrength' : 'audMissingLeverage'];
+      const recKey = q.key === 'idealState' ? 'idealStates' :
+                     q.key === 'deepFear' ? 'fears' :
+                     q.key === 'currentStrength' ? 'strengths' : 'leverages';
+      const recommendations = app[recKey] || [];
+      const stateKey = q.key === 'idealState' ? 'audIdealState' : 
+                       q.key === 'deepFear' ? 'audDeepFear' :
+                       q.key === 'currentStrength' ? 'audCurrentStrength' : 'audMissingLeverage';
+      return `
+        <div class="input-group">
+          <label class="input-label">${q.icon} ${q.label}：${q.q}</label>
+          <p class="input-helper">${q.helper}</p>
+          <div class="pain-options">
+            ${recommendations.map(rec => `
+              <div class="pain-option ${currentVal === rec ? 'selected' : ''}"
+                   data-aud-key="${stateKey}" data-aud-val="${rec}">
+                <div class="pain-option-checkbox"></div>
+                <div><span style="font-size:11px;color:var(--primary);font-weight:700;">✦ AI 推薦</span><br>${rec}</div>
+              </div>
+            `).join('')}
+          </div>
+          <textarea class="textarea-input" id="${stateKey}" 
+            placeholder="或自己寫一個更精準的答案">${currentVal && !recommendations.includes(currentVal) ? currentVal : ''}</textarea>
+        </div>
+      `;
+    }).join('')}
+
+    <div class="input-group" style="border-top: 2px dashed var(--border); padding-top: 24px; margin-top: 32px;">
+      <label class="input-label">表面痛點（可複選 — 這會成為鉤子素材）</label>
+      <p class="input-helper">比起深層恐懼和缺的槓桿，這些是受眾會用自己的話講出來的問題</p>
+      <div class="pain-options">
+        ${pains.map(p => `
+          <div class="pain-option ${state.data.painSelected.includes(p) ? 'selected' : ''}"
+               data-pain="${p}">
+            <div class="pain-option-checkbox"></div>
+            <div>${p}</div>
+          </div>
+        `).join('')}
+      </div>
+      <textarea class="textarea-input" id="painCustom" 
+        placeholder="其他痛點（自選補充）">${state.data.painCustom}</textarea>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Stage 2: 策略 × KPI（2步）
+// ═══════════════════════════════════════════════════════════
+function renderStep6() {
+  // AI 推薦
+  const recommend = AI.recommendGoalLayer(state.data);
+  const layerName = { cognition: '認知層', brand: '品牌層', trust: '信任層', conversion: '轉化層', organization: '組織層' }[recommend.primary];
+  
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 2 · 策略 × KPI</span>
+      <h1 class="step-title">這一批影片的主攻方向</h1>
+      <p class="step-subtitle">AI 已根據你前面的客戶資料，推薦最適合的策略層</p>
+    </div>
+    <div class="ai-analysis-card">
+      <div class="ai-label">AI 策略推薦</div>
+      <div class="ai-insight-text">
+        你的客戶是「<strong>${state.data.industryL2 || '未指定'}</strong>」類型，
+        屬於「${CLIENT_TYPE_SCALE[state.data.clientTypeScale].name}」規模，商業模式為 <strong>${state.data.b2bResult || '未判斷'}</strong>。
+        <br><br>
+        <span class="ai-recommendation-tag">推薦主攻：${layerName}</span>
+        <br>
+        <strong>原因：</strong>${recommend.reason}
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">選擇主攻層（AI 已標示推薦）</label>
+      <div class="options-grid cols-3">
+        ${[
+          { val: 'cognition', emoji: '👁️', title: '認知層', desc: '讓人知道你存在', tag: 'cognition' },
+          { val: 'brand', emoji: '⭐', title: '品牌層', desc: '建立IP/教育市場', tag: 'brand' },
+          { val: 'trust', emoji: '🤝', title: '信任層', desc: '建立專業信任感', tag: 'trust' },
+          { val: 'conversion', emoji: '💰', title: '轉化層', desc: '詢問/轉單/業績', tag: 'conversion' },
+          { val: 'organization', emoji: '🏆', title: '組織層', desc: '招募/合作/擴張', tag: 'organization' }
+        ].map(o => `
+          <div class="option-card tag-${o.tag} ${recommend.primary === o.val ? 'ai-recommended' : ''} ${state.data.tempGoalLayer === o.val ? 'selected' : ''}"
+               data-key="tempGoalLayer" data-val="${o.val}">
+            <span class="option-emoji">${o.emoji}</span>
+            <div class="option-title">${o.title}</div>
+            <div class="option-desc">${o.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderStep7() {
+  // 依選的層級，顯示該層所有目標可複選並分配%
+  const layer = state.data.tempGoalLayer || AI.recommendGoalLayer(state.data).primary;
+  const allGoals = Object.entries(GOALS);
+  
+  // 如果還沒有選擇，先套用 AI 推薦的 mix
+  if (state.data.goalSelected.length === 0) {
+    state.data.goalSelected = AI.recommendGoalMix(state.data);
+  }
+  
+  const total = state.data.goalSelected.reduce((sum, g) => sum + (g.percent || 0), 0);
+  const isValid = total === 100;
+  
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 2 · 策略 × KPI</span>
+      <h1 class="step-title">複選目標 + 分配比例</h1>
+      <p class="step-subtitle">拍 10-30 支影片不會只做一個目標，用比例分配才接近實戰</p>
+    </div>
+    <div class="info-box">
+      📊 <strong>AI 建議的分配</strong>：${state.data.goalSelected.map(g => 
+        `${GOALS[g.id].name} ${g.percent}%`).join('、')}<br>
+      你可以勾選其他目標、調整比例，總和必須為 100%
+    </div>
+    <div class="priority-group">
+      ${allGoals.map(([id, g]) => {
+        const selected = state.data.goalSelected.find(sg => sg.id === id);
+        return `
+          <div class="priority-item ${selected ? 'selected' : ''}">
+            <input type="checkbox" class="priority-checkbox" 
+              ${selected ? 'checked' : ''}
+              data-goal-id="${id}">
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:14px;">
+                <span class="layer-badge ${g.layer}" style="margin-right:6px;">${id}</span>
+                ${g.name}
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
+                KPI：${g.kpi.slice(0, 2).join('、')}
+              </div>
+            </div>
+            <input type="number" class="priority-percent-input" 
+              data-goal-percent="${id}"
+              value="${selected ? selected.percent : 0}" 
+              min="0" max="100" ${!selected ? 'disabled' : ''}> %
+          </div>
+        `;
+      }).join('')}
+      <div class="priority-total-row ${isValid ? 'valid' : 'invalid'}">
+        <span>目前總和</span>
+        <span>${total}% ${isValid ? '✓ 可繼續' : '（需要 = 100%）'}</span>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Stage 3: 腳本生成（3步）
+// ═══════════════════════════════════════════════════════════
+function renderStep8() {
+  const goalIds = state.data.goalSelected.map(g => g.id);
+  const recommendedHooks = [...new Set(goalIds.flatMap(id => GOAL_HOOK_MAP[id] || []))];
+  
+  // 按照分類分組
+  const hookByCategory = {};
+  Object.entries(HOOK_TYPES).forEach(([key, hook]) => {
+    if (!hookByCategory[hook.category]) hookByCategory[hook.category] = [];
+    hookByCategory[hook.category].push({ key, ...hook });
+  });
+  
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 3 · 腳本生成</span>
+      <h1 class="step-title">鉤子類型（可複選 — 10 個腳本會有不同變體）</h1>
+      <p class="step-subtitle">AI 已標示適合你目標的鉤子類型。選越多種，產出的 10 個腳本越多元</p>
+    </div>
+    ${Object.entries(hookByCategory).map(([category, hooks]) => `
+      <div class="input-group">
+        <label class="input-label">【${category}】${HOOK_CATEGORIES[category]}</label>
+        <div class="options-grid cols-2">
+          ${hooks.map(h => `
+            <div class="option-card ${recommendedHooks.includes(h.key) ? 'ai-recommended' : ''} ${state.data.hookTypes.includes(h.key) ? 'selected' : ''}"
+                 data-hook-toggle="${h.key}">
+              <span class="option-emoji">${h.emoji}</span>
+              <div class="option-title">${h.name}</div>
+              <div class="option-desc">${h.use}</div>
+              <div class="option-meta">範例：${h.patterns[0]}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+    ${state.data.hookTypes.length === 0 ? `
+    <div class="alert-box">
+      ⚠️ 還沒選擇鉤子類型。<strong>如果不選</strong>，系統會自動使用 AI 推薦的鉤子組合產出 10 個腳本。
+    </div>` : `
+    <div class="info-box">
+      ✨ 已選 ${state.data.hookTypes.length} 種鉤子類型，最終 10 個腳本將在這些類型中輪替產生。
+    </div>`}
+  `;
+}
+
+function renderStep9() {
+  const goalIds = state.data.goalSelected.map(g => g.id);
+  
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 3 · 腳本生成</span>
+      <h1 class="step-title">中段結構 + CTA 強度</h1>
+      <p class="step-subtitle">選擇一個主要中段結構（10 個腳本都會用這個結構）</p>
+    </div>
+    <div class="input-group">
+      <label class="input-label">中段結構</label>
+      <div class="options-grid cols-3">
+        ${Object.entries(MIDDLE_STRUCTURES).map(([key, s]) => {
+          const isRec = s.suitFor.some(id => goalIds.includes(id));
+          return `
+            <div class="option-card ${isRec ? 'ai-recommended' : ''} ${state.data.middleStructure === key ? 'selected' : ''}"
+                 data-key="middleStructure" data-val="${key}">
+              <span class="option-emoji">${s.emoji}</span>
+              <div class="option-title">${s.name}</div>
+              <div class="option-desc">${s.desc}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">CTA 強度（結尾呼籲的力道）</label>
+      <p class="input-helper">⚠️ 想衝完播率？選「無 CTA」；想轉化？選「強烈」</p>
+      <div class="options-grid cols-4">
+        ${Object.entries(CTA_LIBRARY).map(([key, c]) => `
+          <div class="option-card ${state.data.ctaStrength === key ? 'selected' : ''}"
+               data-key="ctaStrength" data-val="${key}">
+            <div class="option-title">${c.name}</div>
+            <div class="option-desc">${c.desc}</div>
+            <div class="option-meta">例：${c.templates[0]}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ${state.data.ctaStrength && state.data.middleStructure ? (() => {
+      const conflicts = AI.detectKpiConflict(state.data.goalSelected, state.data.videoLength, state.data.ctaStrength);
+      if (conflicts.length > 0) {
+        return `<div class="alert-box"><strong>AI 衝突警示：</strong><br>${conflicts.join('<br>')}</div>`;
+      }
+      return '';
+    })() : ''}
+  `;
+}
+
+function renderStep10() {
+  return `
+    <div class="step-header">
+      <span class="step-stage-label">階段 3 · 腳本生成</span>
+      <h1 class="step-title">運鏡風格 + 影片長度</h1>
+      <p class="step-subtitle">最後一步！運鏡建議先觀察客戶本人的工作環境和日常狀態再選</p>
+    </div>
+    <div class="info-box">
+      🎥 <strong>運鏡選擇原則</strong>：客戶平常就是坐著工作的人（律師、會計）→ 選「坐姿直述」；
+      平常走動多（房仲、業務、教練）→ 選「走動式」；
+      有實際操作的（醫美、料理）→ 選「示範操作」。不要勉強客戶做不自然的風格。
+    </div>
+    <div class="input-group">
+      <label class="input-label">運鏡風格</label>
+      <div class="options-grid cols-3">
+        ${Object.entries(SHOT_STYLES).map(([key, s]) => `
+          <div class="option-card ${state.data.shotStyle === key ? 'selected' : ''}"
+               data-key="shotStyle" data-val="${key}">
+            <span class="option-emoji">${s.emoji}</span>
+            <div class="option-title">${s.name}</div>
+            <div class="option-desc">${s.desc}</div>
+            <div class="option-meta">適合：${s.suitFor}｜成本：${s.effort}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="input-group">
+      <label class="input-label">影片長度</label>
+      <div class="options-grid cols-3">
+        ${Object.entries(VIDEO_LENGTHS).map(([key, v]) => {
+          const goalIds = state.data.goalSelected.map(g => g.id);
+          const isGood = v.goodFor.some(id => goalIds.includes(id));
+          return `
+            <div class="option-card ${isGood ? 'ai-recommended' : ''} ${state.data.videoLength === key ? 'selected' : ''}"
+                 data-key="videoLength" data-val="${key}">
+              <span class="option-emoji">⏱️</span>
+              <div class="option-title">${v.name}</div>
+              <div class="option-desc">${v.desc}</div>
+              ${v.warn ? `<div class="option-meta" style="color:var(--warning-text);">⚠️ ${v.warn}</div>` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 最終結果頁
+// ═══════════════════════════════════════════════════════════
+function renderResult() {
+  // 產生 10 個腳本
+  if (state.data.generatedScripts.length === 0) {
+    state.data.generatedScripts = AI.generateScripts(state.data);
+  }
+  const scripts = state.data.generatedScripts;
+  const notes = AI.generateShootingNotes(state.data, scripts);
+  const d = state.data;
+  const industry = d.industryL3 || d.industryL2 || '(未指定)';
+  const mainGoal = d.goalSelected[0] ? GOALS[d.goalSelected[0].id] : null;
+  const archetype = AI.detectIpArchetype(d);
+  const coreTrait = IP_PERSONALITY_DIMENSIONS[0].options.find(o => o.val === d.ipCoreTrait);
+  const strength = IP_PERSONALITY_DIMENSIONS[1].options.find(o => o.val === d.ipStrength);
+  const blindspot = IP_PERSONALITY_DIMENSIONS[2].options.find(o => o.val === d.ipBlindspot);
+  const visibility = IP_PERSONALITY_DIMENSIONS[3].options.find(o => o.val === d.ipVisibility);
+  const hobbiesList = d.ipHobbies.map(h => {
+    const o = IP_PERSONALITY_DIMENSIONS[5].options.find(opt => opt.val === h);
+    return o ? `${o.icon} ${o.title}` : h;
+  }).join('、');
+  
+  return `
+    <div class="container screen">
+      <div class="result-hero">
+        <div class="badge">✦ SCRIPT GENERATED</div>
+        <h1 class="step-title" style="font-size:38px;">你的 10 組腳本已備好</h1>
+        <p class="step-subtitle">每一組都有不同鉤子 × 結構 × CTA 的組合</p>
+      </div>
+
+      <!-- 【新】IP 原型洞察報告（代理內部使用）-->
+      <div class="ai-report" style="background:linear-gradient(135deg, var(--bg-pink) 0%, var(--bg-soft) 100%);border:2px solid var(--primary);">
+        <div class="ai-report-title">🔒 IP 人格洞察報告（代理內部參考）</div>
+        <div style="background:rgba(255,255,255,0.8);padding:20px;border-radius:12px;margin-bottom:16px;">
+          <div class="label" style="color:var(--primary);font-size:11px;font-weight:700;letter-spacing:2px;margin-bottom:6px;">IP 原型</div>
+          <div style="font-family:'Noto Serif TC',serif;font-size:24px;font-weight:700;color:var(--primary);margin-bottom:8px;">
+            ${archetype.name}
+          </div>
+          <div style="font-size:14px;color:var(--text-main);line-height:1.7;">
+            <strong>最佳發展角度：</strong>${archetype.angle}
+          </div>
+        </div>
+        <div class="ai-report-grid">
+          <div class="ai-report-item">
+            <div class="label">核心性格</div>
+            <div class="value">
+              <strong>${coreTrait?.title || '未選'}</strong><br>
+              ${coreTrait?.desc || ''}
+            </div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">要放大的優勢</div>
+            <div class="value">
+              <strong>${strength?.title || '未選'}</strong><br>
+              ${strength?.desc || ''}
+            </div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">要克服的盲點</div>
+            <div class="value">
+              <strong style="color:var(--warning-text);">${blindspot?.title || '未選'}</strong><br>
+              ${blindspot?.desc || ''}
+            </div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">可見光隨度</div>
+            <div class="value">
+              <strong>${visibility?.title || '未選'}</strong><br>
+              ${visibility?.range || ''}
+            </div>
+          </div>
+        </div>
+        ${hobbiesList ? `
+        <div style="background:rgba(255,255,255,0.6);padding:14px;border-radius:8px;margin-top:12px;font-size:13px;color:var(--text-main);">
+          <strong>興趣素材庫：</strong>${hobbiesList}<br>
+          <span style="font-size:12px;color:var(--text-muted);">→ 建議 70% 做本業 + 30% 融入興趣，建立有記憶點的立體 IP</span>
+        </div>` : ''}
+      </div>
+
+      <!-- 【新】受眾深度洞察 -->
+      <div class="ai-report">
+        <div class="ai-report-title">🎯 受眾深度洞察</div>
+        <div class="ai-report-grid">
+          <div class="ai-report-item">
+            <div class="label">✨ 理想狀態（願景出口）</div>
+            <div class="value">${d.audIdealState || '未填寫'}</div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">😰 深層恐懼（鉤子引爆點）</div>
+            <div class="value">${d.audDeepFear || '未填寫'}</div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">💪 現有優勢（對話起點）</div>
+            <div class="value">${d.audCurrentStrength || '未填寫'}</div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">🔑 缺的槓桿（你的價值）</div>
+            <div class="value">${d.audMissingLeverage || '未填寫'}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI 全面分析 -->
+      <div class="ai-report">
+        <div class="ai-report-title">✦ AI 策略分析報告</div>
+        <div class="ai-report-grid">
+          <div class="ai-report-item">
+            <div class="label">CLIENT PROFILE</div>
+            <div class="value">
+              <strong>${d.clientName || '未命名客戶'}</strong><br>
+              ${industry}｜${CLIENT_TYPE_SCALE[d.clientTypeScale]?.name}<br>
+              商業模式：<strong>${d.b2bResult}</strong>
+            </div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">TARGET AUDIENCE</div>
+            <div class="value">
+              ${GENERATIONS[d.targetGeneration]?.name || '未指定世代'}<br>
+              ${SPENDING_LEVELS[d.targetSpending]?.name || ''}<br>
+              ${d.audienceCustom || ''}
+            </div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">STRATEGY MIX</div>
+            <div class="value">
+              ${d.goalSelected.map(g => 
+                `<strong>${GOALS[g.id]?.name}</strong> ${g.percent}%`).join('<br>')}
+            </div>
+          </div>
+          <div class="ai-report-item">
+            <div class="label">EXECUTION</div>
+            <div class="value">
+              ${VIDEO_LENGTHS[d.videoLength]?.name}｜${SHOT_STYLES[d.shotStyle]?.name}<br>
+              ${CTA_LIBRARY[d.ctaStrength]?.name}<br>
+              鉤子類型：${d.hookTypes.length || '自動'} 種
+            </div>
+          </div>
+        </div>
+        <div class="ai-insight-text" style="background:rgba(255,255,255,0.6);padding:14px;border-radius:8px;margin-top:8px;">
+          <strong>✦ AI 策略分析：</strong>
+          ${buildStrategyAnalysis(d, mainGoal)}
+        </div>
+        ${d.feedItems && d.feedItems.length > 0 ? `
+        <div class="ai-insight-text" style="background:var(--bg-pink);padding:14px;border-radius:8px;margin-top:8px;">
+          <strong>📚 餵養庫啟用：</strong>系統已參考你餵養的 <strong>${d.feedItems.length}</strong> 筆靈感生成腳本。
+        </div>` : ''}
+      </div>
+
+      <!-- 動作列 -->
+      <div class="action-bar">
+        <button class="action-btn primary" id="exportAllBtn">📋 複製全部 10 個腳本</button>
+        <button class="action-btn" id="exportPPTBtn">🎤 匯出簡報版</button>
+        <button class="action-btn" id="saveBtn">💾 儲存此專案</button>
+        <button class="action-btn" id="restartBtn">🔄 重新製作</button>
+      </div>
+
+      <!-- 10 個腳本 -->
+      <div>
+        <h2 class="scripts-section-title">🎬 10 組腳本</h2>
+        <p class="scripts-section-subtitle">點擊展開每一個腳本查看詳情，勾選喜歡的組合成主版本</p>
+        <div class="scripts-grid">
+          ${scripts.map(s => renderScriptCard(s)).join('')}
+        </div>
+      </div>
+
+      <!-- 拍攝提醒 -->
+      <div class="ai-report" style="margin-top:24px;">
+        <div class="ai-report-title">📝 整體拍攝提醒</div>
+        ${notes.map(n => `
+          <div class="ai-insight-text" style="padding:10px 14px;background:rgba(255,255,255,0.6);border-radius:8px;margin-bottom:8px;">
+            • ${n}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderScriptCard(s) {
+  const isSelected = state.data.selectedScripts.includes(s.id);
+  return `
+    <div class="script-card" data-script-id="${s.id}">
+      <div class="script-card-header" data-toggle-script="${s.id}">
+        <div class="script-number">${s.id}</div>
+        <div>
+          <div class="script-card-title">${s.title}</div>
+          <div class="script-card-meta">${s.subtitle}｜${s.length}｜${s.shotStyle}</div>
+        </div>
+        <div style="flex:1;"></div>
+        <div class="script-chevron">▼</div>
+      </div>
+      <div class="script-card-body">
+        <div class="script-section-mini">
+          <span class="section-label hook">HOOK · ${s.hookType}</span>
+          <div class="script-line highlight">${s.hookLine}</div>
+        </div>
+        <div class="script-section-mini">
+          <span class="section-label middle">BODY · ${s.middleStructure}</span>
+          ${s.middle.map(line => `<div class="script-line">${line}</div>`).join('')}
+        </div>
+        <div class="script-section-mini">
+          <span class="section-label cta">CTA · ${s.ctaStrength}</span>
+          <div class="script-line highlight">${s.cta}</div>
+        </div>
+        <div class="script-section-mini">
+          <span class="section-label shot">SHOT</span>
+          <div class="shot-note">🎬 ${s.shotNote}</div>
+        </div>
+        <div class="script-section-mini">
+          <span class="section-label shot">WHY</span>
+          <div class="shot-note" style="background:var(--ai-bg);border-color:var(--ai-border);">
+            ✦ ${s.designRationale}
+          </div>
+        </div>
+        <div class="script-actions">
+          <button class="script-action-btn" data-copy-script="${s.id}">📋 複製這個</button>
+          <button class="script-action-btn ${isSelected ? 'selected' : ''}" data-pick-script="${s.id}">
+            ${isSelected ? '✓ 已選入混搭' : '⭐ 選入混搭'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildStrategyAnalysis(d, mainGoal) {
+  if (!mainGoal) return '請完整填寫前面資料';
+  const parts = [];
+  parts.push(`主力目標「<strong>${mainGoal.name}</strong>」屬於${mainGoal.layerName}，核心 KPI 是 ${mainGoal.kpi.join('、')}。`);
+  if (d.targetGeneration) {
+    const g = GENERATIONS[d.targetGeneration];
+    parts.push(`受眾「${g.name}」主要在 ${g.platform} 活動，${g.traits}。`);
+  }
+  if (d.videoLength && d.ctaStrength) {
+    const conflicts = AI.detectKpiConflict(d.goalSelected, d.videoLength, d.ctaStrength);
+    if (conflicts.length > 0) {
+      parts.push(`<br>${conflicts.map(c => c.replace('⚠️', '⚠️')).join('<br>')}`);
+    } else {
+      parts.push(`你的 ${VIDEO_LENGTHS[d.videoLength]?.name} 長度配 ${CTA_LIBRARY[d.ctaStrength]?.name} 的組合沒有衝突，可執行。`);
+    }
+  }
+  return parts.join(' ');
+}
+
+// ═══════════════════════════════════════════════════════════
+// 事件綁定
+// ═══════════════════════════════════════════════════════════
+function bindStep(step) {
+  // 通用卡片點選
+  document.querySelectorAll('.option-card[data-key]').forEach(card => {
+    card.addEventListener('click', () => {
+      const key = card.dataset.key;
+      const val = card.dataset.val;
+      state.data[key] = val;
+      render();
+    });
+  });
+
+  // 文字輸入
+  ['clientName', 'audienceCustom', 'painCustom', 'audIdealState', 'audDeepFear', 'audCurrentStrength', 'audMissingLeverage'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', (e) => {
+      state.data[id] = e.target.value;
+      updateNav();
+    });
+  });
+
+  // 【新】興趣愛好複選
+  document.querySelectorAll('[data-hobby-toggle]').forEach(card => {
+    card.addEventListener('click', () => {
+      const val = card.dataset.hobbyToggle;
+      const idx = state.data.ipHobbies.indexOf(val);
+      if (idx >= 0) state.data.ipHobbies.splice(idx, 1);
+      else {
+        if (state.data.ipHobbies.length >= 5) {
+          alert('最多選 5 個興趣愛好');
+          return;
+        }
+        state.data.ipHobbies.push(val);
+      }
+      render();
+    });
+  });
+
+  // 【新】受眾深度洞察選擇（同時覆蓋textarea）
+  document.querySelectorAll('[data-aud-key]').forEach(el => {
+    el.addEventListener('click', () => {
+      const key = el.dataset.audKey;
+      const val = el.dataset.audVal;
+      state.data[key] = state.data[key] === val ? '' : val;
+      render();
+    });
+  });
+
+  // Step 1: 三層下拉
+  const l1 = $('industryL1'), l2 = $('industryL2'), l3 = $('industryL3');
+  if (l1) l1.addEventListener('change', (e) => {
+    state.data.industryL1 = e.target.value;
+    state.data.industryL2 = '';
+    state.data.industryL3 = '';
+    render();
+  });
+  if (l2) l2.addEventListener('change', (e) => {
+    state.data.industryL2 = e.target.value;
+    state.data.industryL3 = '';
+    render();
+  });
+  if (l3) l3.addEventListener('change', (e) => {
+    state.data.industryL3 = e.target.value;
+    updateNav();
+  });
+
+  // Step 2: 滑桿
+  const scale = $('clientTypeScale');
+  if (scale) scale.addEventListener('input', (e) => {
+    state.data.clientTypeScale = parseInt(e.target.value);
+    const current = CLIENT_TYPE_SCALE[state.data.clientTypeScale];
+    $('scaleDisplay').textContent = `${current.emoji} 等級 ${state.data.clientTypeScale}：${current.name} — ${current.desc}`;
+  });
+  if (scale) scale.addEventListener('change', () => render());
+
+  // Step 3: B2B 答題
+  document.querySelectorAll('[data-b2b-idx]').forEach(card => {
+    card.addEventListener('click', () => {
+      const idx = parseInt(card.dataset.b2bIdx);
+      const val = card.dataset.b2bVal;
+      state.data.b2bAnswers[idx] = val;
+      render();
+    });
+  });
+
+  // 痛點複選
+  document.querySelectorAll('[data-pain]').forEach(el => {
+    el.addEventListener('click', () => {
+      const pain = el.dataset.pain;
+      const idx = state.data.painSelected.indexOf(pain);
+      if (idx >= 0) state.data.painSelected.splice(idx, 1);
+      else state.data.painSelected.push(pain);
+      render();
+    });
+  });
+
+  // 目標複選 + %
+  document.querySelectorAll('[data-goal-id]').forEach(checkbox => {
+    checkbox.addEventListener('change', (e) => {
+      const id = e.target.dataset.goalId;
+      if (e.target.checked) {
+        if (!state.data.goalSelected.find(g => g.id === id)) {
+          state.data.goalSelected.push({ id, percent: 0 });
+        }
+      } else {
+        state.data.goalSelected = state.data.goalSelected.filter(g => g.id !== id);
+      }
+      render();
+    });
+  });
+  document.querySelectorAll('[data-goal-percent]').forEach(input => {
+    input.addEventListener('input', (e) => {
+      const id = e.target.dataset.goalPercent;
+      const val = parseInt(e.target.value) || 0;
+      const g = state.data.goalSelected.find(gg => gg.id === id);
+      if (g) g.percent = val;
+      const total = state.data.goalSelected.reduce((s, g) => s + (g.percent || 0), 0);
+      const totalRow = document.querySelector('.priority-total-row');
+      if (totalRow) {
+        totalRow.className = `priority-total-row ${total === 100 ? 'valid' : 'invalid'}`;
+        totalRow.innerHTML = `<span>目前總和</span><span>${total}% ${total === 100 ? '✓ 可繼續' : '（需要 = 100%）'}</span>`;
+      }
+      updateNav();
+    });
+  });
+
+  // 鉤子複選
+  document.querySelectorAll('[data-hook-toggle]').forEach(card => {
+    card.addEventListener('click', () => {
+      const key = card.dataset.hookToggle;
+      const idx = state.data.hookTypes.indexOf(key);
+      if (idx >= 0) state.data.hookTypes.splice(idx, 1);
+      else state.data.hookTypes.push(key);
+      render();
+    });
+  });
+
+  // tempGoalLayer 選擇後同步
+  document.querySelectorAll('[data-key="tempGoalLayer"]').forEach(card => {
+    card.addEventListener('click', () => {
+      state.data.tempGoalLayer = card.dataset.val;
+      state.data.goalSelected = [];
+      render();
+    });
+  });
+}
+
+function updateProgress() {
+  const step = state.currentStep;
+  document.querySelectorAll('.progress-stage').forEach(s => {
+    const stage = parseInt(s.dataset.stage);
+    s.classList.remove('active');
+    if ((stage === 1 && step <= 8) || (stage === 2 && step >= 9 && step <= 10) || (stage === 3 && step >= 11)) {
+      s.classList.add('active');
+    }
+  });
+  document.querySelectorAll('.progress-dot').forEach(d => {
+    const s = parseInt(d.dataset.step);
+    d.classList.remove('completed', 'current');
+    if (s < step) d.classList.add('completed');
+    else if (s === step) d.classList.add('current');
+  });
+  $('stepIndicator').textContent = `步驟 ${step} / 13`;
+  $('stepCounter').textContent = `步驟 ${step} / 13`;
+}
+
+function updateNav() {
+  const step = state.currentStep;
+  $('prevBtn').style.visibility = step === 1 ? 'hidden' : 'visible';
+  $('nextBtn').textContent = step === 13 ? '產出 10 組腳本 ✨' : '下一步 →';
+  $('nextBtn').disabled = !canProceed(step);
+}
+
+function canProceed(step) {
+  const d = state.data;
+  switch(step) {
+    case 1: return d.clientName && d.industryL1 && d.industryL2;
+    case 2: return !!d.clientTypeScale;
+    case 3: return d.b2bAnswers.length === 3 && d.b2bAnswers.every(x => x);
+    case 4: return !!d.ipCoreTrait;
+    case 5: return !!d.ipStrength && !!d.ipBlindspot && !!d.ipVisibility;
+    case 6: return !!d.ipLifestyle && d.ipHobbies.length >= 2 && !!d.ipAudienceAppeal;
+    case 7: return !!d.targetGeneration && !!d.targetSpending;
+    case 8: return !!d.audIdealState && !!d.audDeepFear && (d.painSelected.length > 0 || d.painCustom.trim().length > 0);
+    case 9: return !!d.tempGoalLayer;
+    case 10: {
+      const total = d.goalSelected.reduce((s, g) => s + (g.percent || 0), 0);
+      return total === 100;
+    }
+    case 11: return true;
+    case 12: return !!d.middleStructure && !!d.ctaStrength;
+    case 13: return !!d.shotStyle && !!d.videoLength;
+    default: return true;
+  }
+}
+
+// 導航按鈕
+document.addEventListener('DOMContentLoaded', () => {
+  $('prevBtn').addEventListener('click', () => {
+    if (state.currentStep > 1) {
+      state.currentStep--;
+      render();
+      window.scrollTo(0, 0);
+    }
+  });
+  $('nextBtn').addEventListener('click', () => {
+    if (!canProceed(state.currentStep)) return;
+    if (state.currentStep === 13) {
+      state.currentStep = 14;
+      state.data.generatedScripts = [];
+    } else {
+      state.currentStep++;
+    }
+    render();
+    window.scrollTo(0, 0);
+  });
+  render();
+});
+
+// 結果頁動作綁定
+function bindResult() {
+  // 展開/收合腳本
+  document.querySelectorAll('[data-toggle-script]').forEach(header => {
+    header.addEventListener('click', () => {
+      const card = header.closest('.script-card');
+      card.classList.toggle('expanded');
+    });
+  });
+
+  // 複製單一腳本
+  document.querySelectorAll('[data-copy-script]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.copyScript);
+      const s = state.data.generatedScripts.find(ss => ss.id === id);
+      if (!s) return;
+      const text = scriptToText(s, state.data);
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✓ 已複製';
+        setTimeout(() => btn.textContent = orig, 1500);
+      });
+    });
+  });
+
+  // 選入混搭
+  document.querySelectorAll('[data-pick-script]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.pickScript);
+      const idx = state.data.selectedScripts.indexOf(id);
+      if (idx >= 0) state.data.selectedScripts.splice(idx, 1);
+      else state.data.selectedScripts.push(id);
+      render();
+    });
+  });
+
+  // 複製全部 10 個
+  $('exportAllBtn').addEventListener('click', () => {
+    const text = allScriptsToText(state.data);
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = $('exportAllBtn');
+      const orig = btn.textContent;
+      btn.textContent = '✓ 已複製全部 10 個腳本！';
+      setTimeout(() => btn.textContent = orig, 2000);
+    });
+  });
+
+  // 匯出簡報版
+  $('exportPPTBtn').addEventListener('click', () => {
+    openPresentationView();
+  });
+
+  // 儲存
+  $('saveBtn').addEventListener('click', async () => {
+    const key = `script_project_${Date.now()}`;
+    try {
+      localStorage.setItem(key, JSON.stringify(state.data));
+      alert(`✓ 已儲存到此裝置！\n專案代號：${key}`);
+    } catch(e) {
+      // 下載 JSON
+      const blob = new Blob([JSON.stringify(state.data, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${state.data.clientName || 'script'}_${Date.now()}.json`;
+      a.click();
+    }
+  });
+
+  // 重新開始
+  $('restartBtn').addEventListener('click', () => {
+    if (confirm('確定重新開始？目前的腳本會消失（可以先存檔）')) {
+      Object.assign(state, {
+        currentStep: 0,
+        data: {
+          clientName: '', industryL1: '', industryL2: '', industryL3: '',
+          clientTypeScale: 3, b2bAnswers: [], b2bResult: '',
+          ipCoreTrait: '', ipStrength: '', ipBlindspot: '', ipVisibility: '',
+          ipLifestyle: '', ipHobbies: [], ipAudienceAppeal: '',
+          targetGeneration: '', targetSpending: '', audienceCustom: '',
+          audIdealState: '', audDeepFear: '', audCurrentStrength: '', audMissingLeverage: '',
+          painSelected: [], painCustom: '',
+          goalSelected: [], tempGoalLayer: '',
+          hookTypes: [], middleStructure: '', ctaStrength: '',
+          shotStyle: '', videoLength: '',
+          generatedScripts: [], selectedScripts: [],
+          feedItems: feedManager.items // 保留餵養庫
+        }
+      });
+      render();
+    }
+  });
+}
+
+function scriptToText(s, d) {
+  const audience = AI.buildAudienceLabel(d);
+  return `
+==================================================
+${s.title}
+${s.subtitle}｜${s.length}｜${s.shotStyle}
+==================================================
+
+【前 3 秒鉤子 · ${s.hookType}】
+${s.hookLine}
+
+【中段內容 · ${s.middleStructure}】
+${s.middle.join('\n')}
+
+【結尾 CTA · ${s.ctaStrength}】
+${s.cta}
+
+【運鏡】
+${s.shotNote}
+
+【為何這樣設計】
+${s.designRationale}
+`.trim();
+}
+
+function allScriptsToText(d) {
+  const header = `
+==================================================
+短影音腳本企劃｜${d.clientName}
+${new Date().toLocaleDateString('zh-TW')}
+==================================================
+
+【客戶資訊】
+客戶：${d.clientName}
+產業：${d.industryL3 || d.industryL2}
+類型：${CLIENT_TYPE_SCALE[d.clientTypeScale]?.name}
+商業模式：${d.b2bResult}
+
+【目標受眾】
+世代：${GENERATIONS[d.targetGeneration]?.name}
+消費力：${SPENDING_LEVELS[d.targetSpending]?.name}
+${d.audienceCustom ? '補充：' + d.audienceCustom : ''}
+
+【核心痛點】
+${[...d.painSelected, d.painCustom].filter(Boolean).join('\n')}
+
+【策略分配】
+${d.goalSelected.map(g => `${GOALS[g.id]?.name}：${g.percent}%`).join('\n')}
+
+【執行設定】
+影片長度：${VIDEO_LENGTHS[d.videoLength]?.name}
+運鏡風格：${SHOT_STYLES[d.shotStyle]?.name}
+CTA強度：${CTA_LIBRARY[d.ctaStrength]?.name}
+
+==================================================
+10 組腳本
+==================================================
+`;
+  const scripts = d.generatedScripts.map(s => scriptToText(s, d)).join('\n\n');
+  const notes = `
+
+==================================================
+整體拍攝提醒
+==================================================
+${AI.generateShootingNotes(d, d.generatedScripts).map(n => '• ' + n).join('\n')}
+
+（由 短影音代理營運｜腳本產生器 V2 產出）
+`;
+  return header + scripts + notes;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 【新】餵養庫 (Feed Library) - 整合趨勢雷達的 localStorage
+// ═══════════════════════════════════════════════════════════
+const FEED_STORAGE_KEY = 'script_gen_feed_items';
+const RADAR_STORAGE_KEY = 'trend_radar_items'; // 趨勢雷達的key（若存在則自動整合）
+
+const feedManager = {
+  items: [],
+  activeTab: 'add',
+  
+  init() {
+    this.load();
+    this.bindUI();
+    this.updateBadge();
+  },
+
+  load() {
+    // 載入自己的餵養庫
+    try {
+      const own = localStorage.getItem(FEED_STORAGE_KEY);
+      if (own) this.items = JSON.parse(own);
+    } catch(e) { this.items = []; }
+    
+    // 嘗試整合趨勢雷達的資料（如有）
+    try {
+      const radar = localStorage.getItem(RADAR_STORAGE_KEY);
+      if (radar) {
+        const radarItems = JSON.parse(radar);
+        if (Array.isArray(radarItems)) {
+          radarItems.forEach(r => {
+            if (!this.items.find(i => i.id === r.id)) {
+              this.items.push({
+                id: r.id || ('radar_' + Date.now() + Math.random()),
+                platform: r.platform || 'instagram',
+                performance: r.performance || 'solid',
+                contentType: r.contentType || 'knowledge',
+                hookText: r.hookText || r.hook || '',
+                url: r.url || '',
+                notes: r.notes || r.insight || '',
+                fromRadar: true,
+                createdAt: r.createdAt || new Date().toISOString()
+              });
+            }
+          });
+          this.save();
+        }
+      }
+    } catch(e) {}
+    
+    state.data.feedItems = this.items;
+  },
+  
+  save() {
+    try {
+      localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(this.items));
+      state.data.feedItems = this.items;
+    } catch(e) {
+      console.warn('Storage failed', e);
+    }
+  },
+  
+  add(item) {
+    const newItem = {
+      id: 'feed_' + Date.now(),
+      platform: item.platform || 'instagram',
+      performance: item.performance || 'solid',
+      contentType: item.contentType || 'knowledge',
+      hookText: item.hookText || '',
+      url: item.url || '',
+      notes: item.notes || '',
+      createdAt: new Date().toISOString()
+    };
+    this.items.unshift(newItem);
+    this.save();
+    this.updateBadge();
+  },
+  
+  remove(id) {
+    this.items = this.items.filter(i => i.id !== id);
+    this.save();
+    this.updateBadge();
+  },
+  
+  updateBadge() {
+    const badge = $('feedBadge');
+    if (!badge) return;
+    const count = this.items.length;
+    if (count > 0) {
+      badge.textContent = count;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  },
+  
+  togglePanel() {
+    const panel = $('feedPanel');
+    if (!panel) return;
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+      this.renderTab();
+    }
+  },
+  
+  closePanel() {
+    $('feedPanel')?.classList.remove('open');
+  },
+  
+  renderTab() {
+    const container = $('feedTabContent');
+    if (!container) return;
+    if (this.activeTab === 'add') {
+      container.innerHTML = this.renderAddForm();
+      this.bindAddForm();
+    } else if (this.activeTab === 'list') {
+      container.innerHTML = this.renderList();
+      this.bindList();
+    } else if (this.activeTab === 'howto') {
+      container.innerHTML = this.renderHowTo();
+    }
+  },
+  
+  renderAddForm() {
+    return `
+      <div class="feed-form">
+        <div class="input-group">
+          <label class="input-label">📱 平台</label>
+          <div class="feed-platforms-grid">
+            ${FEED_CATEGORIES.platforms.map(p => `
+              <div class="feed-platform-chip" data-feed-platform="${p.key}">
+                ${p.icon} ${p.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">🔗 貼文連結（選填）</label>
+          <input type="url" class="text-input" id="feedUrl" placeholder="https://...">
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">🎣 鉤子文案（重點！）</label>
+          <textarea class="textarea-input" id="feedHook" placeholder="這支影片/貼文的開頭怎麼寫？抓住你的那句話是什麼？"></textarea>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">📊 成效等級</label>
+          <select class="select-input" id="feedPerformance">
+            ${FEED_CATEGORIES.performance.map(p => `
+              <option value="${p.key}">${p.label}</option>
+            `).join('')}
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">📝 內容類型</label>
+          <select class="select-input" id="feedContentType">
+            ${FEED_CATEGORIES.contentType.map(c => `
+              <option value="${c.key}">${c.label}</option>
+            `).join('')}
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">💡 觀察筆記</label>
+          <textarea class="textarea-input" id="feedNotes" placeholder="為什麼這個紅？有什麼可以學的？"></textarea>
+        </div>
+        
+        <button class="btn btn-primary" id="feedAddBtn" style="width:100%;">
+          ✦ 加入餵養庫
+        </button>
+      </div>
+    `;
+  },
+  
+  renderList() {
+    if (this.items.length === 0) {
+      return `
+        <div class="feed-empty">
+          <div class="big-icon">📭</div>
+          <div style="font-weight:600;margin-bottom:8px;">還沒有靈感記錄</div>
+          <div>看到好內容時，點「新增靈感」存進來<br>產出腳本時，系統會參考這些資料</div>
+        </div>
+      `;
+    }
+    return `
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+        已累積 <strong style="color:var(--primary);">${this.items.length}</strong> 筆靈感
+      </div>
+      ${this.items.map(item => {
+        const platform = FEED_CATEGORIES.platforms.find(p => p.key === item.platform);
+        const perf = FEED_CATEGORIES.performance.find(p => p.key === item.performance);
+        const type = FEED_CATEGORIES.contentType.find(c => c.key === item.contentType);
+        return `
+          <div class="feed-item-card">
+            <div class="feed-item-head">
+              <span class="feed-item-platform">${platform?.icon || ''} ${platform?.label || ''}</span>
+              <button class="feed-item-delete" data-delete-feed="${item.id}">🗑</button>
+            </div>
+            <div class="feed-item-hook">${item.hookText || '(無鉤子)'}</div>
+            <div class="feed-item-meta">
+              <span style="color:${perf?.color || 'var(--text-muted)'};font-weight:600;">${perf?.label || ''}</span> · ${type?.label || ''}
+              ${item.notes ? '<br>💡 ' + item.notes : ''}
+              ${item.url ? '<br><a href="' + item.url + '" target="_blank" style="color:var(--primary);">看原貼文</a>' : ''}
+              ${item.fromRadar ? '<br><span style="font-size:10px;color:var(--text-light);">📡 來自趨勢雷達</span>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+  },
+  
+  renderHowTo() {
+    return `
+      <div style="font-size:14px;color:var(--text-main);line-height:1.8;">
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin-bottom:12px;">📚 餵養庫是什麼？</h4>
+        <p style="margin-bottom:16px;">
+          當你在 IG、TikTok、小紅書看到表現好的內容，把它的<strong>鉤子文案</strong>、成效等級、觀察筆記記錄進來。
+          產出 10 組腳本時，系統會參考你餵養的資料，讓腳本更貼近市場上實際有效的內容。
+        </p>
+        
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🔄 雙向循環</h4>
+        <ul style="padding-left:20px;margin-bottom:16px;">
+          <li style="margin-bottom:6px;">看到好內容 → 存進餵養庫</li>
+          <li style="margin-bottom:6px;">產腳本 → 系統自動參考餵養庫</li>
+          <li style="margin-bottom:6px;">拍攝上架 → 回報成效到餵養庫</li>
+          <li style="margin-bottom:6px;">累積越多 → AI 推薦越準確</li>
+        </ul>
+        
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">📡 趨勢雷達整合</h4>
+        <p style="margin-bottom:16px;">
+          如果你已經在用「趨勢雷達」工具，打開餵養庫時會<strong>自動整合</strong>兩邊資料（透過 localStorage）。
+          在同一個瀏覽器內的資料會互通。
+        </p>
+        
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🚀 未來 AI 分析功能</h4>
+        <p style="background:var(--bg-pink);padding:12px;border-radius:8px;font-size:13px;">
+          當系統接入 Claude AI API 後，你可以：
+          <br>1. 輸入 IG 帳號連結 → AI 自動分析帳號風格
+          <br>2. 餵養庫會自動比對相似爆款
+          <br>3. 腳本生成時會根據餵養庫的成效數據調整公式
+        </p>
+      </div>
+    `;
+  },
+  
+  bindUI() {
+    $('feedFab')?.addEventListener('click', () => this.togglePanel());
+    $('feedClose')?.addEventListener('click', () => this.closePanel());
+    document.querySelectorAll('[data-feed-tab]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        this.activeTab = tab.dataset.feedTab;
+        document.querySelectorAll('.feed-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        this.renderTab();
+      });
+    });
+  },
+  
+  bindAddForm() {
+    document.querySelectorAll('[data-feed-platform]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-feed-platform]').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      });
+    });
+    $('feedAddBtn')?.addEventListener('click', () => {
+      const selectedPlatform = document.querySelector('[data-feed-platform].selected');
+      if (!selectedPlatform) {
+        alert('請選一個平台');
+        return;
+      }
+      const hook = $('feedHook')?.value.trim();
+      if (!hook) {
+        alert('鉤子文案不能空，這是最重要的');
+        return;
+      }
+      this.add({
+        platform: selectedPlatform.dataset.feedPlatform,
+        performance: $('feedPerformance')?.value || 'solid',
+        contentType: $('feedContentType')?.value || 'knowledge',
+        hookText: hook,
+        url: $('feedUrl')?.value.trim() || '',
+        notes: $('feedNotes')?.value.trim() || ''
+      });
+      alert('✓ 已加入餵養庫！');
+      this.activeTab = 'list';
+      document.querySelectorAll('.feed-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.feedTab === 'list');
+      });
+      this.renderTab();
+    });
+  },
+  
+  bindList() {
+    document.querySelectorAll('[data-delete-feed]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (confirm('確定刪除這筆靈感？')) {
+          this.remove(btn.dataset.deleteFeed);
+          this.renderTab();
+        }
+      });
+    });
+  },
+  
+  // 【關鍵】取得相關的餵養靈感，給腳本生成器使用
+  getRelevantInspirations(contentType = null, limit = 3) {
+    let filtered = this.items.filter(i => i.hookText && i.hookText.length > 5);
+    if (contentType) {
+      filtered = filtered.filter(i => i.contentType === contentType);
+    }
+    // 依成效排序
+    const perfOrder = { 'viral': 0, 'hot': 1, 'solid': 2, 'niche': 3 };
+    filtered.sort((a, b) => (perfOrder[a.performance] || 99) - (perfOrder[b.performance] || 99));
+    return filtered.slice(0, limit);
+  }
+};
+
+// 頁面載入後初始化餵養庫
+document.addEventListener('DOMContentLoaded', () => {
+  feedManager.init();
+});
+
+// ═══════════════════════════════════════════════════════════
+// 簡報匯出視圖（新分頁顯示）
+// ═══════════════════════════════════════════════════════════
+function openPresentationView() {
+  const d = state.data;
+  const mainGoal = d.goalSelected[0] ? GOALS[d.goalSelected[0].id] : null;
+  const industry = d.industryL3 || d.industryL2 || '';
+  const win = window.open('', '_blank');
+  
+  const slidesHTML = `
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>簡報版｜${d.clientName || '短影音腳本企劃'}</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; font-family: 'Noto Sans TC', sans-serif; background: #2A1A1C; color: #FDFBF8; }
+  .slide { width: 100vw; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 60px 80px; page-break-after: always; background: #FDFBF8; color: #2A1A1C; position: relative; box-sizing: border-box; }
+  .slide.dark { background: #A51820; color: #FDFBF8; }
+  .slide.accent { background: #FAE8EA; color: #2A1A1C; }
+  .slide-number { position: absolute; bottom: 30px; right: 40px; font-size: 12px; opacity: 0.5; letter-spacing: 2px; }
+  .brand-mark { position: absolute; top: 30px; left: 40px; font-size: 11px; letter-spacing: 3px; opacity: 0.6; font-weight: 600; }
+  h1 { font-family: 'Noto Serif TC', serif; font-size: 60px; font-weight: 900; line-height: 1.2; margin: 0 0 30px; letter-spacing: -1px; }
+  h2 { font-family: 'Noto Serif TC', serif; font-size: 42px; font-weight: 700; line-height: 1.3; margin: 0 0 24px; }
+  h3 { font-family: 'Noto Serif TC', serif; font-size: 28px; font-weight: 600; margin: 0 0 16px; color: #A51820; }
+  .dark h3 { color: #FAE8EA; }
+  p { font-size: 18px; line-height: 1.8; margin: 0 0 12px; }
+  .big { font-size: 22px; }
+  .label { font-size: 12px; letter-spacing: 3px; opacity: 0.6; font-weight: 700; margin-bottom: 8px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-top: 30px; }
+  .card { background: #F4F1EC; padding: 24px; border-radius: 12px; border-left: 4px solid #A51820; }
+  .dark .card { background: rgba(255,255,255,0.1); border-color: #FAE8EA; color: #FDFBF8; }
+  .hook-line { font-family: 'Noto Serif TC', serif; font-size: 32px; line-height: 1.4; font-weight: 600; padding: 20px 0; color: #A51820; }
+  .middle-list { list-style: none; padding: 0; }
+  .middle-list li { padding: 10px 0 10px 30px; position: relative; font-size: 17px; line-height: 1.6; }
+  .middle-list li::before { content: '▸'; position: absolute; left: 0; color: #A51820; font-weight: 700; }
+  .cta-box { background: #FAE8EA; padding: 24px; border-radius: 12px; border: 2px solid #A51820; margin-top: 20px; }
+  .cta-box .big { font-family: 'Noto Serif TC', serif; font-weight: 700; color: #A51820; }
+  .meta-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; font-size: 14px; }
+  .meta-item { padding: 8px 14px; background: rgba(0,0,0,0.05); border-radius: 6px; }
+  .dark .meta-item { background: rgba(255,255,255,0.15); }
+  .print-btn { position: fixed; top: 20px; right: 20px; padding: 12px 20px; background: #A51820; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; z-index: 100; font-family: inherit; }
+  @media print {
+    .print-btn { display: none; }
+    .slide { page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+  <button class="print-btn" onclick="window.print()">🖨 列印 / 另存 PDF</button>
+  
+  <!-- Slide 1: 封面 -->
+  <div class="slide dark">
+    <div class="brand-mark">SCRIPT STRATEGY</div>
+    <div class="label" style="color: #FAE8EA;">短影音腳本企劃</div>
+    <h1>${d.clientName || '未命名客戶'}</h1>
+    <h3 style="color: #FAE8EA;">${industry}</h3>
+    <p class="big" style="margin-top: 30px; opacity: 0.85;">
+      10 組腳本變體 × AI 策略分析 × 可執行拍攝指南
+    </p>
+    <p style="position: absolute; bottom: 60px; left: 80px; opacity: 0.6;">
+      ${new Date().toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })}
+    </p>
+    <div class="slide-number" style="color: #FAE8EA;">01</div>
+  </div>
+  
+  <!-- Slide 2: 客戶定位 -->
+  <div class="slide">
+    <div class="brand-mark">CLIENT POSITIONING</div>
+    <div class="label">客戶定位</div>
+    <h2>這位客戶是誰？</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>產業與規模</h3>
+        <p class="big"><strong>${industry}</strong></p>
+        <p>${CLIENT_TYPE_SCALE[d.clientTypeScale]?.name}</p>
+        <p style="color: #7A5A5E;">${CLIENT_TYPE_SCALE[d.clientTypeScale]?.desc}</p>
+      </div>
+      <div class="card">
+        <h3>商業模式</h3>
+        <p class="big"><strong>${d.b2bResult || '未判斷'}</strong></p>
+        <p style="color: #7A5A5E;">${d.b2bResult && d.b2bResult.includes('B2B') ? '長決策、重信任、客單高' : 'B2C 短決策、重感受、客單較低'}</p>
+      </div>
+    </div>
+    <div class="slide-number">02</div>
+  </div>
+  
+  <!-- Slide 3: 受眾畫像 -->
+  <div class="slide accent">
+    <div class="brand-mark">TARGET AUDIENCE</div>
+    <div class="label">受眾畫像</div>
+    <h2>要對誰說話？</h2>
+    ${d.targetGeneration ? `
+    <div class="grid-2">
+      <div class="card" style="background: white;">
+        <h3>${GENERATIONS[d.targetGeneration]?.emoji} ${GENERATIONS[d.targetGeneration]?.name}</h3>
+        <p><strong>年齡：</strong>${GENERATIONS[d.targetGeneration]?.age}</p>
+        <p><strong>消費力：</strong>${GENERATIONS[d.targetGeneration]?.power}</p>
+        <p><strong>主要平台：</strong>${GENERATIONS[d.targetGeneration]?.platform}</p>
+      </div>
+      <div class="card" style="background: white;">
+        <h3>行為特徵</h3>
+        <p>${GENERATIONS[d.targetGeneration]?.traits}</p>
+        <p style="margin-top: 16px;"><strong>購買邏輯：</strong>${GENERATIONS[d.targetGeneration]?.buying}</p>
+      </div>
+    </div>` : ''}
+    <div class="slide-number">03</div>
+  </div>
+  
+  <!-- Slide 4: 核心痛點 -->
+  <div class="slide">
+    <div class="brand-mark">PAIN POINTS</div>
+    <div class="label">核心痛點</div>
+    <h2>他們最困擾什麼？</h2>
+    <ul class="middle-list" style="margin-top: 30px;">
+      ${[...d.painSelected, d.painCustom].filter(Boolean).map(p => `<li style="font-size: 20px;">${p}</li>`).join('')}
+    </ul>
+    <div class="slide-number">04</div>
+  </div>
+  
+  <!-- Slide 5: 策略分配 -->
+  <div class="slide accent">
+    <div class="brand-mark">STRATEGY MIX</div>
+    <div class="label">策略分配</div>
+    <h2>內容比例規劃</h2>
+    <p class="big" style="color: #7A5A5E;">這一批腳本的目標分配，決定長期效果</p>
+    <div class="grid-3" style="margin-top: 40px;">
+      ${d.goalSelected.map(g => `
+        <div class="card" style="background: white; text-align: center;">
+          <h3 style="font-size: 56px; margin-bottom: 8px;">${g.percent}%</h3>
+          <p style="font-size: 18px; font-weight: 600;">${GOALS[g.id]?.name}</p>
+          <p style="font-size: 13px; color: #7A5A5E; margin-top: 10px;">KPI：${GOALS[g.id]?.kpi.slice(0, 2).join('、')}</p>
+        </div>
+      `).join('')}
+    </div>
+    <div class="slide-number">05</div>
+  </div>
+  
+  <!-- Slides 6-15: 10個腳本 -->
+  ${d.generatedScripts.map((s, idx) => `
+    <div class="slide">
+      <div class="brand-mark">SCRIPT ${String(s.id).padStart(2, '0')} / 10</div>
+      <div class="label">${s.hookCategory}</div>
+      <h2>${s.title}</h2>
+      <div class="meta-row">
+        <span class="meta-item">${s.length}</span>
+        <span class="meta-item">${s.shotStyle}</span>
+        <span class="meta-item">${s.ctaStrength}</span>
+        <span class="meta-item">主打：${s.goal.name}</span>
+      </div>
+      <div style="margin-top: 30px;">
+        <div class="label" style="color: #A51820;">HOOK · 前 3 秒</div>
+        <div class="hook-line">"${s.hookLine}"</div>
+      </div>
+      <div style="margin-top: 20px;">
+        <div class="label" style="color: #A51820;">BODY · ${s.middleStructure}</div>
+        <ul class="middle-list">
+          ${s.middle.map(line => `<li>${line}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="cta-box">
+        <div class="label" style="color: #A51820; opacity: 1;">CTA · ${s.ctaStrength}</div>
+        <p class="big">${s.cta}</p>
+      </div>
+      <div class="slide-number">${String(idx + 6).padStart(2, '0')}</div>
+    </div>
+  `).join('')}
+  
+  <!-- Final: 拍攝提醒 -->
+  <div class="slide dark">
+    <div class="brand-mark" style="color: #FAE8EA;">PRODUCTION NOTES</div>
+    <div class="label" style="color: #FAE8EA;">拍攝注意事項</div>
+    <h2>整批 10 支腳本的執行重點</h2>
+    <ul class="middle-list" style="margin-top: 30px;">
+      ${AI.generateShootingNotes(d, d.generatedScripts).map(n => 
+        `<li style="font-size: 17px; line-height: 1.8;">${n}</li>`).join('')}
+    </ul>
+    <div class="slide-number" style="color: #FAE8EA;">16</div>
+  </div>
+  
+  <!-- 結尾 -->
+  <div class="slide accent">
+    <div style="text-align: center; margin: auto; max-width: 600px;">
+      <div class="label" style="margin-bottom: 20px;">END</div>
+      <h1 style="font-size: 48px;">讓每一支短影音<br>都有明確方向</h1>
+      <p style="font-size: 16px; color: #7A5A5E; margin-top: 40px;">
+        由 短影音代理營運｜腳本產生器 V2 產出<br>
+        ${new Date().toLocaleDateString('zh-TW')}
+      </p>
+    </div>
+  </div>
+  
+</body>
+</html>
+  `;
+  
+  win.document.write(slidesHTML);
+  win.document.close();
+}
+
+</script>
+
+</body>
+</html>
