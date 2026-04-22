@@ -5110,11 +5110,18 @@ const feedManager = {
     $('copyGeminiPrompt')?.addEventListener('click', () => {
       const prompt = `你是一位專業短影音分析師，我需要你拆解一支爆款影片。
 
-⚠️ 格式要求（非常重要）：
-請用下面的 XML 標籤結構輸出。不要使用 Markdown 粗體（**）或其他格式符號。
-每個標籤內容就是純文字。如果某欄位無資訊請填「未提供」。
+⚠️⚠️⚠️ 格式要求（極度重要，違反會導致解析失敗）：
 
-請直接複製以下 XML 範本，填完回給我：
+1. 用 XML 標籤結構輸出
+2. 🚫 絕對不要在 < > _ 前面加反斜線 \\
+   ❌ 錯誤範例：\\<emotional\\_value\\>  (加了 \\ 會讓我的程式抓不到)
+   ✅ 正確範例：<emotional_value>
+3. 🚫 不要使用 Markdown 粗體 **
+4. 🚫 不要把整個 XML 包在 \`\`\` code block 裡
+5. 每個標籤內容就是純文字
+6. 如果某欄位無資訊請填「未提供」
+
+請直接複製以下 XML 範本，填完回給我（不要加任何跳脫符號）：
 
 <basic>
 <platform>精準填：Instagram、TikTok、YouTube Shorts、小紅書、Facebook Reels、Threads、YouTube、Bilibili 之一</platform>
@@ -5436,6 +5443,14 @@ const feedManager = {
   // 【V4.2 核心】黃金提示詞解析器：優先 XML，fallback 舊格式
   // 【V4.3 重磅】Claude API 真 AI 解析 — 能理解任何格式
   async parseWithClaudeAPI(rawText, apiKey) {
+    // 【V4.5】前處理：清除跳脫字元（Claude API 也可能遇到）
+    rawText = rawText
+      .replace(/\\</g, '<')
+      .replace(/\\>/g, '>')
+      .replace(/\\_/g, '_')
+      .replace(/\\\\/g, '\\')
+      .replace(/\\\*/g, '*');
+    
     const systemPrompt = `你是一個資料解析專家。使用者會貼給你一段 Gemini 對爆款短影音的分析。
 你的任務是把這段分析轉換成**純 JSON 格式**，對應以下欄位（沒提到的欄位填空字串）：
 
@@ -5679,6 +5694,17 @@ const feedManager = {
 
   // 【V4.2】黃金提示詞解析器（純程式 fallback）
   parseGeminiOutput(text) {
+    // 【V4.5 關鍵修復】前處理：清除 Gemini 可能加的所有跳脫字元
+    // 常見：\<tag\> \_底線\_ \`\`\` 包裹 等
+    text = text
+      .replace(/\\</g, '<')      // \<  → <
+      .replace(/\\>/g, '>')      // \>  → >
+      .replace(/\\_/g, '_')      // \_  → _
+      .replace(/\\\\/g, '\\')    // \\  → \
+      .replace(/\\\*/g, '*')     // \*  → *
+      .replace(/^```(?:xml)?\s*/m, '')  // 清除開頭 ```xml
+      .replace(/\s*```$/m, '');  // 清除結尾 ```
+    
     const result = {};
     let filledCount = 0;
     
