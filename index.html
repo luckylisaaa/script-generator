@@ -2167,6 +2167,49 @@ const FEED_CATEGORIES = {
     { key: 'cross-industry-inspire', label: '💡 跨業學習', desc: '其他產業可以借鏡這個形式', color: '#2E6B2E' },
     { key: 'universal', label: '🌐 通用範本', desc: '幾乎所有產業都能用', color: '#4A90E2' },
     { key: 'niche-only', label: '🎯 僅限該產業', desc: '換產業會不適合，不通用', color: '#7A5A5E' }
+  ],
+  // 【V4.4 新】① 流量觸發點（可複選）
+  viralTriggers: [
+    { key: 'conflict', label: '⚔️ 衝突感', desc: '製造對立、反差、意外' },
+    { key: 'gain', label: '🎁 獲得感', desc: '觀眾覺得賺到知識' },
+    { key: 'visual-wonder', label: '✨ 視覺奇觀', desc: '畫面本身就很特別' },
+    { key: 'strong-resonance', label: '💥 強烈共鳴', desc: '說出觀眾心聲' },
+    { key: 'emotional', label: '❤️ 情緒共振', desc: '引發強烈情感' },
+    { key: 'info-value', label: '📚 資訊價值', desc: '乾貨實用' },
+    { key: 'identity', label: '🏆 認同渴望', desc: '想變成那樣的人' },
+    { key: 'absurd-fun', label: '🎭 荒謬趣味', desc: '搞笑/無厘頭' }
+  ],
+  // 【V4.4 新】② 拍攝難度
+  productionDifficulty: [
+    { key: 'level-1', label: '⭐', desc: '手機單人可拍' },
+    { key: 'level-2', label: '⭐⭐', desc: '需穩定器或打燈' },
+    { key: 'level-3', label: '⭐⭐⭐', desc: '需外景或場景設計' },
+    { key: 'level-4', label: '⭐⭐⭐⭐', desc: '需專業設備+多人協作' },
+    { key: 'level-5', label: '⭐⭐⭐⭐⭐', desc: '專業團隊+長時間籌備' }
+  ],
+  // 【V4.4 新】② 後製耗時
+  postProductionTime: [
+    { key: 'quick', label: '🟢 1 小時內', desc: '套版剪輯' },
+    { key: 'medium', label: '🟡 2-4 小時', desc: '標準剪輯+字幕' },
+    { key: 'long', label: '🟠 4-8 小時', desc: '動態字幕+特效' },
+    { key: 'very-long', label: '🔴 8 小時以上', desc: '複雜動畫/合成' }
+  ],
+  // 【V4.4 新】④ 觀眾預期行為（可複選）
+  audienceBehavior: [
+    { key: 'share-mock', label: '😏 轉發嘲笑', desc: '分享給朋友吐槽' },
+    { key: 'save', label: '🔖 收藏', desc: '以後有用' },
+    { key: 'tag-friend', label: '🏷 Tag 朋友', desc: '留言區 tag 好友' },
+    { key: 'follow', label: '👤 追蹤', desc: '想看更多' },
+    { key: 'comment', label: '💬 主動留言', desc: '引發討論' },
+    { key: 'repost', label: '🔁 轉發分享', desc: '分享到限動/Threads' },
+    { key: 'contact', label: '📩 私訊詢問', desc: '想購買或諮詢' },
+    { key: 'silent-scroll', label: '👀 看完就滑', desc: '沒記憶點（壞）' }
+  ],
+  // 【V4.4 新】④ 記憶停留時長
+  memoryDuration: [
+    { key: 'short', label: '⚡ 短', desc: '看完馬上忘' },
+    { key: 'medium', label: '💫 中', desc: '當天會想起' },
+    { key: 'long', label: '🌟 長', desc: '一週後仍記得' }
   ]
 };
 
@@ -4082,6 +4125,27 @@ const DEFAULT_FEED_ITEM = {
   mainLesson: '',       // 一句話學到的事
   notes: '',            // 其他備註
   
+  // ───── 【V4.4 新】J. 爆紅基因 ─────
+  viralTriggers: [],    // 流量觸發點（可複選）
+  
+  // ───── 【V4.4 新】K. 製作 SOP 評級 ─────
+  productionDifficulty: '', // 拍攝難度 1-5
+  postProductionTime: '',   // 後製耗時
+  equipmentNeeded: '',      // 器材清單（文字）
+  estimatedCost: '',        // 預估成本（文字）
+  
+  // ───── 【V4.4 新】L. 跨產業應用 ⭐ ─────
+  crossIndustryA: '',       // 建議產業 A（例：律師）
+  crossIndustryAAdapt: '',  // A 的轉換建議
+  crossIndustryB: '',       // 建議產業 B
+  crossIndustryBAdapt: '',
+  crossIndustryC: '',       // 建議產業 C
+  crossIndustryCAdapt: '',
+  
+  // ───── 【V4.4 新】M. 情緒價值 ─────
+  audienceBehavior: [],     // 觀眾預期行為（可複選）
+  memoryDuration: '',       // 記憶停留時長
+  
   // ───── 系統欄位 ─────
   fromRadar: false,
   createdAt: '',
@@ -4619,6 +4683,113 @@ const feedManager = {
           <label class="input-label">🧠 一句話學到的事</label>
           <textarea class="textarea-input" id="feedMainLesson" placeholder="把枯燥的台詞韻律化，讓動作對準音樂節奏" style="min-height:60px;"></textarea>
         </div>
+
+        <!-- ========== 【V4.4 新】J. 爆紅基因 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          🧬 爆紅基因（流量觸發點）
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+          這支為什麼會突破演算法？選 1-3 個最主要的觸發點（可複選）
+        </div>
+        <div class="input-group">
+          <div class="feed-platforms-grid" style="grid-template-columns:repeat(2, 1fr);">
+            ${FEED_CATEGORIES.viralTriggers.map(v => `
+              <div class="feed-platform-chip" data-feed-trigger="${v.key}" title="${v.desc}">
+                ${v.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- ========== 【V4.4 新】K. 製作 SOP 評級 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          🛠 製作 SOP 評級（報價參考）
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">拍攝難度</label>
+          <div class="feed-platforms-grid" style="grid-template-columns:repeat(5, 1fr);">
+            ${FEED_CATEGORIES.productionDifficulty.map(d => `
+              <div class="feed-platform-chip" data-feed-difficulty="${d.key}" title="${d.desc}" style="text-align:center;">
+                ${d.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">後製耗時</label>
+          <div class="feed-platforms-grid" style="grid-template-columns:repeat(2, 1fr);">
+            ${FEED_CATEGORIES.postProductionTime.map(p => `
+              <div class="feed-platform-chip" data-feed-posttime="${p.key}" title="${p.desc}">
+                ${p.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🎥 器材清單</label>
+          <input type="text" class="text-input" id="feedEquipment" placeholder="例：手機 + 穩定器 + 打燈 + 音樂授權" style="font-size:13px;">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">💰 預估製作成本</label>
+          <input type="text" class="text-input" id="feedEstimatedCost" placeholder="例：NT$ 5,000 - 10,000" style="font-size:13px;">
+        </div>
+
+        <!-- ========== 【V4.4 新】L. 跨產業應用 ⭐ ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          🌐 跨產業應用（AI 產的轉譯建議）
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;background:#FFF8E1;padding:10px;border-radius:6px;border-left:3px solid #FFC107;">
+          💡 這是你跟客戶提案的武器：<strong>如果把這個形式換到其他產業，該怎麼調整？</strong>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🅰️ 建議產業 A</label>
+          <input type="text" class="text-input" id="feedIndustryA" placeholder="例：律師 / 房仲" style="font-size:13px;">
+          <textarea class="textarea-input" id="feedIndustryAAdapt" placeholder="保留什麼、改什麼、範例台詞..." style="min-height:60px;margin-top:6px;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🅱️ 建議產業 B</label>
+          <input type="text" class="text-input" id="feedIndustryB" placeholder="例：健身教練 / 餐飲老闆" style="font-size:13px;">
+          <textarea class="textarea-input" id="feedIndustryBAdapt" placeholder="保留什麼、改什麼、範例台詞..." style="min-height:60px;margin-top:6px;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🅲 建議產業 C</label>
+          <input type="text" class="text-input" id="feedIndustryC" placeholder="例：醫美診所 / 寵物美容" style="font-size:13px;">
+          <textarea class="textarea-input" id="feedIndustryCAdapt" placeholder="保留什麼、改什麼、範例台詞..." style="min-height:60px;margin-top:6px;"></textarea>
+        </div>
+
+        <!-- ========== 【V4.4 新】M. 情緒價值 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          💖 情緒價值（觀眾心理動作）
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">觀眾看完後會做什麼（可複選）</label>
+          <div class="feed-platforms-grid" style="grid-template-columns:repeat(2, 1fr);">
+            ${FEED_CATEGORIES.audienceBehavior.map(b => `
+              <div class="feed-platform-chip" data-feed-behavior="${b.key}" title="${b.desc}">
+                ${b.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">記憶停留時長</label>
+          <div class="feed-platforms-grid" style="grid-template-columns:repeat(3, 1fr);">
+            ${FEED_CATEGORIES.memoryDuration.map(m => `
+              <div class="feed-platform-chip" data-feed-memory="${m.key}" title="${m.desc}">
+                ${m.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
         ` : ''}
 
         <div class="input-group">
@@ -4756,6 +4927,26 @@ const feedManager = {
           ${item.views ? `<br>👁 ${item.views}${item.likes ? ' · ❤️ ' + item.likes : ''}${item.comments ? ' · 💬 ' + item.comments : ''}${item.shares ? ' · 🔁 ' + item.shares : ''}` : ''}
           ${item.keyQuote ? '<br>💎 <em>"' + item.keyQuote + '"</em>' : ''}
           ${item.mainLesson ? '<br>🧠 ' + item.mainLesson : ''}
+          ${item.crossIndustryA || item.crossIndustryB || item.crossIndustryC ? `
+            <br><div style="margin-top:8px;padding:10px;background:#FFF8E1;border-left:3px solid #FFC107;border-radius:6px;font-size:11px;">
+              <strong>🌐 跨產業應用：</strong>
+              ${item.crossIndustryA ? '<br>🅰️ <strong>' + item.crossIndustryA + '</strong>' + (item.crossIndustryAAdapt ? '：' + item.crossIndustryAAdapt.substring(0, 80) + (item.crossIndustryAAdapt.length > 80 ? '...' : '') : '') : ''}
+              ${item.crossIndustryB ? '<br>🅱️ <strong>' + item.crossIndustryB + '</strong>' + (item.crossIndustryBAdapt ? '：' + item.crossIndustryBAdapt.substring(0, 80) + (item.crossIndustryBAdapt.length > 80 ? '...' : '') : '') : ''}
+              ${item.crossIndustryC ? '<br>🅲 <strong>' + item.crossIndustryC + '</strong>' + (item.crossIndustryCAdapt ? '：' + item.crossIndustryCAdapt.substring(0, 80) + (item.crossIndustryCAdapt.length > 80 ? '...' : '') : '') : ''}
+            </div>
+          ` : ''}
+          ${item.viralTriggers && item.viralTriggers.length > 0 ? `
+            <br><div style="margin-top:6px;font-size:11px;">
+              🧬 觸發: ${item.viralTriggers.map(t => FEED_CATEGORIES.viralTriggers.find(v => v.key === t)?.label || t).join(' · ')}
+            </div>
+          ` : ''}
+          ${item.productionDifficulty || item.postProductionTime ? `
+            <br><div style="margin-top:6px;font-size:11px;color:var(--text-muted);">
+              🛠 ${item.productionDifficulty ? FEED_CATEGORIES.productionDifficulty.find(d => d.key === item.productionDifficulty)?.label || '' : ''}
+              ${item.postProductionTime ? ' · ' + (FEED_CATEGORIES.postProductionTime.find(p => p.key === item.postProductionTime)?.label || '') : ''}
+              ${item.estimatedCost ? ' · 💰 ' + item.estimatedCost : ''}
+            </div>
+          ` : ''}
           ${item.notes ? '<br>💬 ' + item.notes : ''}
           ${item.url ? '<br><a href="' + item.url + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation(); window.open(\'' + item.url + '\', \'_blank\'); return false;" style="color:var(--primary);text-decoration:underline;">🔗 看原貼文</a>' : ''}
           ${item.fromRadar ? '<br><span style="font-size:10px;color:var(--text-light);">📡 來自趨勢雷達</span>' : ''}
@@ -4995,6 +5186,34 @@ const feedManager = {
 <main_lesson>一句話學到的事</main_lesson>
 </insight>
 
+<viral_genes>
+<triggers>此影片觸發的流量點（可多選，用逗號分隔，從以下選）：
+衝突感 / 獲得感 / 視覺奇觀 / 強烈共鳴 / 情緒共振 / 資訊價值 / 認同渴望 / 荒謬趣味</triggers>
+</viral_genes>
+
+<production_sop>
+<difficulty>拍攝難度（1-5 星）：選一個：⭐ / ⭐⭐ / ⭐⭐⭐ / ⭐⭐⭐⭐ / ⭐⭐⭐⭐⭐</difficulty>
+<post_time>後製耗時：選一個：1 小時內 / 2-4 小時 / 4-8 小時 / 8 小時以上</post_time>
+<equipment>器材清單（手機/穩定器/打燈/音樂授權等）</equipment>
+<estimated_cost>預估製作成本（新台幣）</estimated_cost>
+</production_sop>
+
+<cross_industry>
+如果把這支影片的形式套到其他 3 個不同產業，應該怎麼調整？請具體寫出。
+<industry_a>建議產業 A（例：律師）</industry_a>
+<industry_a_adapt>轉換方式：保留什麼、改什麼、範例台詞（2-3 行）</industry_a_adapt>
+<industry_b>建議產業 B（例：健身教練）</industry_b>
+<industry_b_adapt>轉換方式：保留什麼、改什麼、範例台詞</industry_b_adapt>
+<industry_c>建議產業 C（例：醫美診所）</industry_c>
+<industry_c_adapt>轉換方式：保留什麼、改什麼、範例台詞</industry_c_adapt>
+</cross_industry>
+
+<emotional_value>
+<audience_behavior>觀眾看完後會做什麼？（可多選，用逗號分隔，從以下選）：
+轉發嘲笑 / 收藏 / Tag 朋友 / 追蹤 / 主動留言 / 轉發分享 / 私訊詢問 / 看完就滑</audience_behavior>
+<memory_duration>記憶停留時長：短（看完馬上忘）/ 中（當天會想起）/ 長（一週後仍記得）</memory_duration>
+</emotional_value>
+
 請直接輸出 XML，不要加前言。白話文事實描述，不要用「很有吸引力」這種虛詞。`;
       
       navigator.clipboard.writeText(prompt).then(() => {
@@ -5051,6 +5270,44 @@ const feedManager = {
         chip.classList.add('selected');
         chip.style.background = 'var(--bg-pink)';
         chip.style.borderColor = 'var(--primary)';
+      });
+    });
+
+    // 【V4.4 新】流量觸發點（複選）
+    document.querySelectorAll('[data-feed-trigger]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+      });
+    });
+
+    // 【V4.4 新】拍攝難度（單選）
+    document.querySelectorAll('[data-feed-difficulty]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-feed-difficulty]').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      });
+    });
+
+    // 【V4.4 新】後製耗時（單選）
+    document.querySelectorAll('[data-feed-posttime]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-feed-posttime]').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      });
+    });
+
+    // 【V4.4 新】觀眾行為（複選）
+    document.querySelectorAll('[data-feed-behavior]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+      });
+    });
+
+    // 【V4.4 新】記憶時長（單選）
+    document.querySelectorAll('[data-feed-memory]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-feed-memory]').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
       });
     });
 
@@ -5117,6 +5374,12 @@ const feedManager = {
 
       // 深度模式才有的欄位
       if (this.inputMode === 'deep') {
+        // V4.4 新：收集複選值
+        const viralTriggersSelected = Array.from(document.querySelectorAll('[data-feed-trigger].selected'))
+          .map(c => c.dataset.feedTrigger);
+        const audienceBehaviorSelected = Array.from(document.querySelectorAll('[data-feed-behavior].selected'))
+          .map(c => c.dataset.feedBehavior);
+        
         Object.assign(baseData, {
           sourceNote: cleanText($('feedSourceNote')?.value.trim()) || '',
           hookVisual: cleanText($('feedHookVisual')?.value.trim()) || '',
@@ -5136,7 +5399,21 @@ const feedManager = {
           mainLesson: cleanText($('feedMainLesson')?.value.trim()) || '',
           effectType: effectType,
           conversionPrediction: conversionPred,
-          learnStrategy: learnStrategy
+          learnStrategy: learnStrategy,
+          // V4.4 新欄位
+          viralTriggers: viralTriggersSelected,
+          productionDifficulty: document.querySelector('[data-feed-difficulty].selected')?.dataset.feedDifficulty || '',
+          postProductionTime: document.querySelector('[data-feed-posttime].selected')?.dataset.feedPosttime || '',
+          equipmentNeeded: cleanText($('feedEquipment')?.value.trim()) || '',
+          estimatedCost: cleanText($('feedEstimatedCost')?.value.trim()) || '',
+          crossIndustryA: cleanText($('feedIndustryA')?.value.trim()) || '',
+          crossIndustryAAdapt: cleanText($('feedIndustryAAdapt')?.value.trim()) || '',
+          crossIndustryB: cleanText($('feedIndustryB')?.value.trim()) || '',
+          crossIndustryBAdapt: cleanText($('feedIndustryBAdapt')?.value.trim()) || '',
+          crossIndustryC: cleanText($('feedIndustryC')?.value.trim()) || '',
+          crossIndustryCAdapt: cleanText($('feedIndustryCAdapt')?.value.trim()) || '',
+          audienceBehavior: audienceBehaviorSelected,
+          memoryDuration: document.querySelector('[data-feed-memory].selected')?.dataset.feedMemory || ''
         });
       }
 
@@ -5186,7 +5463,20 @@ const feedManager = {
   "mainLesson": "一句話學到的事",
   "effectType": "viral-spread（傳播型）/ conversion（轉換型）/ brand-trust（品牌型）/ entertainment（娛樂型）",
   "conversionPrediction": "high / medium / low",
-  "learnStrategy": "avoid-same-industry（同業避開）/ cross-industry-inspire（跨業學習）/ universal（通用）/ niche-only（僅限該產業）"
+  "learnStrategy": "avoid-same-industry（同業避開）/ cross-industry-inspire（跨業學習）/ universal（通用）/ niche-only（僅限該產業）",
+  "viralTriggers": ["從這些選 1-3 個：conflict（衝突感）、gain（獲得感）、visual-wonder（視覺奇觀）、strong-resonance（強烈共鳴）、emotional（情緒共振）、info-value（資訊價值）、identity（認同渴望）、absurd-fun（荒謬趣味）"],
+  "productionDifficulty": "level-1 / level-2 / level-3 / level-4 / level-5",
+  "postProductionTime": "quick（1小時內） / medium（2-4小時） / long（4-8小時） / very-long（8小時以上）",
+  "equipmentNeeded": "器材清單（文字描述）",
+  "estimatedCost": "預估製作成本（例如 NT$ 5,000-10,000）",
+  "crossIndustryA": "建議產業 A 名稱",
+  "crossIndustryAAdapt": "A 的轉換建議（具體範例台詞）",
+  "crossIndustryB": "建議產業 B 名稱",
+  "crossIndustryBAdapt": "B 的轉換建議",
+  "crossIndustryC": "建議產業 C 名稱",
+  "crossIndustryCAdapt": "C 的轉換建議",
+  "audienceBehavior": ["從這些選 1-3 個：share-mock（轉發嘲笑）、save（收藏）、tag-friend（Tag 朋友）、follow（追蹤）、comment（主動留言）、repost（轉發分享）、contact（私訊詢問）、silent-scroll（看完就滑）"],
+  "memoryDuration": "short / medium / long"
 }
 
 規則：
@@ -5291,6 +5581,63 @@ const feedManager = {
         }
       }
     });
+    
+    // 【V4.4 新】單項文字欄位
+    const newSingleFields = {
+      'feedEquipment': result.equipmentNeeded,
+      'feedEstimatedCost': result.estimatedCost,
+      'feedIndustryA': result.crossIndustryA,
+      'feedIndustryAAdapt': result.crossIndustryAAdapt,
+      'feedIndustryB': result.crossIndustryB,
+      'feedIndustryBAdapt': result.crossIndustryBAdapt,
+      'feedIndustryC': result.crossIndustryC,
+      'feedIndustryCAdapt': result.crossIndustryCAdapt
+    };
+    Object.entries(newSingleFields).forEach(([id, val]) => {
+      if (val && val !== '') {
+        const el = $(id);
+        if (el) { el.value = clean(val); filledCount++; }
+      }
+    });
+    
+    // 【V4.4 新】拍攝難度（單選）
+    if (result.productionDifficulty) {
+      document.querySelectorAll('[data-feed-difficulty]').forEach(c => c.classList.remove('selected'));
+      const target = document.querySelector(`[data-feed-difficulty="${result.productionDifficulty}"]`);
+      if (target) { target.classList.add('selected'); filledCount++; }
+    }
+    
+    // 【V4.4 新】後製耗時（單選）
+    if (result.postProductionTime) {
+      document.querySelectorAll('[data-feed-posttime]').forEach(c => c.classList.remove('selected'));
+      const target = document.querySelector(`[data-feed-posttime="${result.postProductionTime}"]`);
+      if (target) { target.classList.add('selected'); filledCount++; }
+    }
+    
+    // 【V4.4 新】記憶停留時長（單選）
+    if (result.memoryDuration) {
+      document.querySelectorAll('[data-feed-memory]').forEach(c => c.classList.remove('selected'));
+      const target = document.querySelector(`[data-feed-memory="${result.memoryDuration}"]`);
+      if (target) { target.classList.add('selected'); filledCount++; }
+    }
+    
+    // 【V4.4 新】流量觸發點（複選）
+    if (result.viralTriggers && Array.isArray(result.viralTriggers)) {
+      document.querySelectorAll('[data-feed-trigger]').forEach(c => c.classList.remove('selected'));
+      result.viralTriggers.forEach(t => {
+        const target = document.querySelector(`[data-feed-trigger="${t}"]`);
+        if (target) { target.classList.add('selected'); filledCount++; }
+      });
+    }
+    
+    // 【V4.4 新】觀眾行為（複選）
+    if (result.audienceBehavior && Array.isArray(result.audienceBehavior)) {
+      document.querySelectorAll('[data-feed-behavior]').forEach(c => c.classList.remove('selected'));
+      result.audienceBehavior.forEach(b => {
+        const target = document.querySelector(`[data-feed-behavior="${b}"]`);
+        if (target) { target.classList.add('selected'); filledCount++; }
+      });
+    }
     
     // 效果類型
     if (result.effectType) {
