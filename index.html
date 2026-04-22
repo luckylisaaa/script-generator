@@ -3952,15 +3952,76 @@ const RADAR_STORAGE_KEY = 'trend_radar_items'; // 趨勢雷達的key（若存在
 const feedManager = {
   items: [],
   activeTab: 'add',
+  firebaseReady: false,
   
   init() {
-    this.load();
+    // 先從 localStorage 載入（瞬間可用）
+    this.loadLocal();
+    
+    // 等 Firebase 準備好再同步雲端
+    if (window.__FIREBASE__ && window.__FIREBASE__.isReady) {
+      this.connectFirebase();
+    } else {
+      window.addEventListener('firebaseReady', () => this.connectFirebase());
+    }
+    
     this.bindUI();
     this.updateBadge();
   },
+  
+  // 連上 Firestore，讀取雲端資料、訂閱即時更新
+  async connectFirebase() {
+    try {
+      const FB = window.__FIREBASE__;
+      this.firebaseReady = true;
+      
+      if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 載入雲端資料...');
+      
+      // 訂閱 feed_items 集合（即時同步）
+      const q = FB.query(FB.collection(FB.db, 'feed_items'), FB.orderBy('createdAt', 'desc'));
+      
+      FB.onSnapshot(q, (snapshot) => {
+        const cloudItems = [];
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          cloudItems.push({
+            id: docSnap.id,
+            platform: data.platform || 'instagram',
+            performance: data.performance || 'solid',
+            contentType: data.contentType || 'knowledge',
+            hookText: data.hookText || '',
+            url: data.url || '',
+            notes: data.notes || '',
+            fromRadar: data.fromRadar || false,
+            createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAtString || new Date().toISOString()
+          });
+        });
+        this.items = cloudItems;
+        state.data.feedItems = cloudItems;
+        // 同時更新本機備份
+        try {
+          localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(cloudItems));
+        } catch(e) {}
+        this.updateBadge();
+        // 如果餵養庫面板開著，更新顯示
+        const panel = document.getElementById('feedPanel');
+        if (panel && panel.classList.contains('open') && this.activeTab === 'list') {
+          this.renderTab();
+        }
+        if (window.syncStatus) window.syncStatus.set('connected', `☁️ 已同步 ${cloudItems.length} 筆`);
+      }, (error) => {
+        console.error('[Firebase] 訂閱失敗:', error);
+        if (window.syncStatus) window.syncStatus.set('error', '❌ 雲端連線失敗');
+      });
+    } catch(e) {
+      console.error('[Firebase] 連線失敗:', e);
+      this.firebaseReady = false;
+      if (window.syncStatus) window.syncStatus.set('error', '❌ 雲端連線失敗');
+    }
+  },
 
-  load() {
-    // 載入自己的餵養庫
+  loadLocal() {
+    // 載入本機備份（快速顯示，之後會被雲端資料覆蓋）
     try {
       const own = localStorage.getItem(FEED_STORAGE_KEY);
       if (own) this.items = JSON.parse(own);
@@ -3987,7 +4048,6 @@ const feedManager = {
               });
             }
           });
-          this.save();
         }
       }
     } catch(e) {}
@@ -3995,34 +4055,71 @@ const feedManager = {
     state.data.feedItems = this.items;
   },
   
-  save() {
+  // 保留本機儲存作為離線備份
+  saveLocal() {
     try {
       localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(this.items));
       state.data.feedItems = this.items;
     } catch(e) {
-      console.warn('Storage failed', e);
+      console.warn('Local storage failed', e);
     }
   },
   
-  add(item) {
+  async add(item) {
     const newItem = {
-      id: 'feed_' + Date.now(),
       platform: item.platform || 'instagram',
       performance: item.performance || 'solid',
       contentType: item.contentType || 'knowledge',
       hookText: item.hookText || '',
       url: item.url || '',
       notes: item.notes || '',
-      createdAt: new Date().toISOString()
+      createdAtString: new Date().toISOString()
     };
-    this.items.unshift(newItem);
-    this.save();
+    
+    // 優先寫入雲端
+    if (this.firebaseReady && window.__FIREBASE__) {
+      try {
+        if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 上傳中...');
+        const FB = window.__FIREBASE__;
+        await FB.addDoc(FB.collection(FB.db, 'feed_items'), {
+          ...newItem,
+          createdAt: FB.serverTimestamp()
+        });
+        // 不手動更新 items，因為 onSnapshot 會自動同步
+        return;
+      } catch(e) {
+        console.error('[Firebase] 新增失敗，改用本機:', e);
+        if (window.syncStatus) window.syncStatus.set('error', '⚠️ 雲端失敗，存本機');
+      }
+    }
+    
+    // 本機後備方案（離線時或雲端失敗時）
+    this.items.unshift({
+      id: 'feed_' + Date.now(),
+      ...newItem,
+      createdAt: newItem.createdAtString
+    });
+    this.saveLocal();
     this.updateBadge();
   },
   
-  remove(id) {
+  async remove(id) {
+    // 優先從雲端刪除
+    if (this.firebaseReady && window.__FIREBASE__ && !id.startsWith('feed_') && !id.startsWith('radar_')) {
+      try {
+        if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 刪除中...');
+        const FB = window.__FIREBASE__;
+        await FB.deleteDoc(FB.doc(FB.db, 'feed_items', id));
+        // onSnapshot 會自動同步
+        return;
+      } catch(e) {
+        console.error('[Firebase] 刪除失敗:', e);
+      }
+    }
+    
+    // 本機後備
     this.items = this.items.filter(i => i.id !== id);
-    this.save();
+    this.saveLocal();
     this.updateBadge();
   },
   
@@ -4159,6 +4256,14 @@ const feedManager = {
   renderHowTo() {
     return `
       <div style="font-size:14px;color:var(--text-main);line-height:1.8;">
+        <div style="background:linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);padding:14px;border-radius:10px;margin-bottom:18px;border-left:4px solid #4CAF50;">
+          <strong style="color:#2E7D32;">☁️ 已啟用雲端同步</strong><br>
+          <span style="font-size:13px;color:var(--text-muted);">
+            你的餵養資料會自動儲存到 Firebase，跨裝置自動同步。
+            左下角綠色指示燈代表連線正常。
+          </span>
+        </div>
+        
         <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin-bottom:12px;">📚 餵養庫是什麼？</h4>
         <p style="margin-bottom:16px;">
           當你在 IG、TikTok、小紅書看到表現好的內容，把它的<strong>鉤子文案</strong>、成效等級、觀察筆記記錄進來。
@@ -4167,24 +4272,35 @@ const feedManager = {
         
         <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🔄 雙向循環</h4>
         <ul style="padding-left:20px;margin-bottom:16px;">
-          <li style="margin-bottom:6px;">看到好內容 → 存進餵養庫</li>
+          <li style="margin-bottom:6px;">看到好內容 → 存進餵養庫（自動同步雲端）</li>
           <li style="margin-bottom:6px;">產腳本 → 系統自動參考餵養庫</li>
           <li style="margin-bottom:6px;">拍攝上架 → 回報成效到餵養庫</li>
           <li style="margin-bottom:6px;">累積越多 → AI 推薦越準確</li>
         </ul>
         
-        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">📡 趨勢雷達整合</h4>
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">📱 跨裝置使用</h4>
         <p style="margin-bottom:16px;">
-          如果你已經在用「趨勢雷達」工具，打開餵養庫時會<strong>自動整合</strong>兩邊資料（透過 localStorage）。
-          在同一個瀏覽器內的資料會互通。
+          手機、平板、不同電腦都可以使用，資料會<strong>自動同步</strong>到同一個雲端。
+          看到好內容隨手存（手機），回到電腦產腳本時就會看到。
         </p>
         
-        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🚀 未來 AI 分析功能</h4>
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🔌 離線備援</h4>
+        <p style="margin-bottom:16px;">
+          沒網路時：系統會自動降到「本機模式」，資料先存瀏覽器。
+          網路恢復後：會在下次打開時重新連接雲端。
+        </p>
+        
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">📡 趨勢雷達整合</h4>
+        <p style="margin-bottom:16px;">
+          如果你已經在用「趨勢雷達」工具，打開餵養庫時會<strong>自動整合</strong>兩邊資料。
+        </p>
+        
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🚀 未來擴充</h4>
         <p style="background:var(--bg-pink);padding:12px;border-radius:8px;font-size:13px;">
-          當系統接入 Claude AI API 後，你可以：
-          <br>1. 輸入 IG 帳號連結 → AI 自動分析帳號風格
-          <br>2. 餵養庫會自動比對相似爆款
-          <br>3. 腳本生成時會根據餵養庫的成效數據調整公式
+          下一階段（路線 B）可以加入：
+          <br>1. Google 登入，每個人有私人餵養庫
+          <br>2. 團隊共用資料庫（給你的夥伴）
+          <br>3. 輸入 IG 連結 → AI 自動分析帳號風格
         </p>
       </div>
     `;
@@ -4469,6 +4585,106 @@ function openPresentationView() {
   win.document.close();
 }
 
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- Firebase SDK 載入與初始化                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { 
+    getFirestore, collection, addDoc, getDocs, deleteDoc, doc, 
+    query, orderBy, serverTimestamp, onSnapshot 
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  // 你的 Firebase 專案設定
+  const firebaseConfig = {
+    apiKey: "AIzaSyB9LITVD28W4234k2Kb2ifvhWQZ6RbBsTE",
+    authDomain: "script-generator-96d5b.firebaseapp.com",
+    projectId: "script-generator-96d5b",
+    storageBucket: "script-generator-96d5b.firebasestorage.app",
+    messagingSenderId: "443973037389",
+    appId: "1:443973037389:web:fcc555d34ff45e68b39b04",
+    measurementId: "G-SS6ZTHHK3S"
+  };
+
+  // 初始化
+  const firebaseApp = initializeApp(firebaseConfig);
+  const db = getFirestore(firebaseApp);
+
+  // 把 Firebase 工具掛到全域，讓主程式可以使用
+  window.__FIREBASE__ = {
+    db,
+    collection, addDoc, getDocs, deleteDoc, doc,
+    query, orderBy, serverTimestamp, onSnapshot,
+    isReady: true
+  };
+
+  // 告訴主程式 Firebase 好了
+  window.dispatchEvent(new Event('firebaseReady'));
+  console.log('[Firebase] 已連線到 script-generator-96d5b');
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- 雲端同步狀態指示器                                              -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="syncIndicator" style="
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: white;
+  border: 1px solid var(--border, #E8E3DA);
+  border-radius: 20px;
+  padding: 6px 14px 6px 10px;
+  font-size: 11px;
+  color: var(--text-muted, #7A5A5E);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 100;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: all 0.3s;
+">
+  <span id="syncDot" style="
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: background 0.3s;
+  "></span>
+  <span id="syncText">連線中...</span>
+</div>
+
+<script>
+// 雲端同步指示器控制
+window.syncStatus = {
+  set(status, text) {
+    const dot = document.getElementById('syncDot');
+    const txt = document.getElementById('syncText');
+    if (!dot || !txt) return;
+    const colors = {
+      connected: '#4CAF50',  // 綠
+      syncing: '#FFC107',    // 黃
+      error: '#E57373',      // 紅
+      offline: '#999'        // 灰
+    };
+    dot.style.background = colors[status] || '#ccc';
+    txt.textContent = text;
+  }
+};
+
+// 載入時先顯示連線中
+window.addEventListener('firebaseReady', () => {
+  window.syncStatus.set('connected', '☁️ 已連接雲端');
+});
+
+// 10 秒後若還沒連線，顯示離線模式
+setTimeout(() => {
+  if (!window.__FIREBASE__ || !window.__FIREBASE__.isReady) {
+    window.syncStatus.set('offline', '📵 離線模式（僅本機）');
+  }
+}, 10000);
 </script>
 
 </body>
