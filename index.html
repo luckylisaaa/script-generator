@@ -2079,19 +2079,36 @@ const AUDIENCE_APPLICATIONS = {
 // 【新增】IG 餵養庫分類（整合趨勢雷達結構）
 // ═══════════════════════════════════════════════════════════
 const FEED_CATEGORIES = {
+  // 【V4.1 新】平台分三群組
   platforms: [
-    { key: 'instagram', label: 'Instagram', icon: '📷' },
-    { key: 'tiktok', label: 'TikTok', icon: '🎵' },
-    { key: 'youtube', label: 'YouTube Shorts', icon: '📺' },
-    { key: 'xiaohongshu', label: '小紅書', icon: '📕' },
-    { key: 'facebook', label: 'Facebook', icon: '👥' },
-    { key: 'threads', label: 'Threads', icon: '💬' }
+    // 短影音群組
+    { key: 'instagram', label: 'IG Reels', icon: '📷', group: 'short', fullLabel: 'Instagram Reels' },
+    { key: 'tiktok', label: 'TikTok', icon: '🎵', group: 'short', fullLabel: 'TikTok' },
+    { key: 'youtube-shorts', label: 'YT Shorts', icon: '📺', group: 'short', fullLabel: 'YouTube Shorts' },
+    { key: 'xiaohongshu', label: '小紅書', icon: '📕', group: 'short', fullLabel: '小紅書' },
+    { key: 'facebook-reels', label: 'FB Reels', icon: '👥', group: 'short', fullLabel: 'Facebook Reels' },
+    { key: 'threads', label: 'Threads', icon: '💬', group: 'short', fullLabel: 'Threads' },
+    // 長影音群組
+    { key: 'youtube', label: 'YouTube', icon: '🎬', group: 'long', fullLabel: 'YouTube（主頻道）' },
+    { key: 'facebook-video', label: 'FB 長片', icon: '📹', group: 'long', fullLabel: 'Facebook 長影片' },
+    { key: 'bilibili', label: '嗶哩嗶哩', icon: '📼', group: 'long', fullLabel: 'Bilibili' },
+    { key: 'tv', label: '電視節目', icon: '📡', group: 'long', fullLabel: '電視節目 / 廣告' },
+    { key: 'podcast', label: 'Podcast', icon: '🎙', group: 'long', fullLabel: 'Podcast' },
+    // 其他（自由輸入）
+    { key: 'other', label: '其他', icon: '🌐', group: 'other', fullLabel: '其他（自由輸入）' }
+  ],
+  // 【V4.1 新】平台群組定義
+  platformGroups: [
+    { key: 'short', label: '⚡ 短影音', desc: '60 秒內為主，垂直螢幕' },
+    { key: 'long', label: '🎬 長影音', desc: '3 分鐘以上，橫向為主' },
+    { key: 'other', label: '🌐 其他來源', desc: '電視、雜誌、podcast 或自由輸入' }
   ],
   performance: [
     { key: 'viral', label: '爆款 (100萬+)', color: '#A51820' },
     { key: 'hot', label: '熱門 (10-100萬)', color: '#C02030' },
     { key: 'solid', label: '穩定 (1-10萬)', color: '#7A5A5E' },
-    { key: 'niche', label: '小眾但精準', color: '#2E6B2E' }
+    { key: 'niche', label: '小眾但精準', color: '#2E6B2E' },
+    { key: 'unsure', label: '待評估', color: '#999' }
   ],
   contentType: [
     { key: 'knowledge', label: '知識型' },
@@ -2099,7 +2116,57 @@ const FEED_CATEGORIES = {
     { key: 'opinion', label: '觀點型' },
     { key: 'entertainment', label: '娛樂型' },
     { key: 'tutorial', label: '教學型' },
-    { key: 'lifestyle', label: '生活型' }
+    { key: 'lifestyle', label: '生活型' },
+    { key: 'other', label: '其他' }
+  ],
+  // 【新】效果類型標籤 ⭐ 成效審查機制
+  effectType: [
+    { key: 'viral-spread', label: '🔥 傳播型', desc: '觸及廣、分享高，適合曝光', color: '#A51820' },
+    { key: 'conversion', label: '💰 轉換型', desc: '引發詢問或購買', color: '#C02030' },
+    { key: 'brand-trust', label: '⭐ 品牌型', desc: '建立信任與權威', color: '#7A1018' },
+    { key: 'entertainment', label: '😄 娛樂型', desc: '純娛樂，不一定帶業績', color: '#999' }
+  ],
+  // 【新】轉換預測
+  conversionPrediction: [
+    { key: 'high', label: '高轉換', desc: '內容直接引發行動', color: '#2E6B2E' },
+    { key: 'medium', label: '中轉換', desc: '需要搭配其他內容', color: '#C0A020' },
+    { key: 'low', label: '低轉換', desc: '純傳播，不帶業績', color: '#999' }
+  ],
+  // 【新】適合的客戶階段
+  clientStage: [
+    { key: 'cold-start', label: '冷啟動期', desc: '帳號 0-1K 粉，主打曝光' },
+    { key: 'growth', label: '成長期', desc: '1K-10K，建立信任' },
+    { key: 'harvest', label: '收割期', desc: '10K+，轉換變現' }
+  ],
+  // 【新】產業分類（對應腳本產生器的產業樹）
+  industries: [
+    { key: 'legal', label: '⚖️ 法律服務' },
+    { key: 'medical', label: '🩺 醫療照護' },
+    { key: 'finance', label: '💰 財會金融' },
+    { key: 'beauty', label: '💄 美妝保養' },
+    { key: 'fitness', label: '💪 健身運動' },
+    { key: 'realestate', label: '🏠 房產居家' },
+    { key: 'haircare', label: '💇 美容美髮' },
+    { key: 'aesthetic', label: '✨ 醫美整形' },
+    { key: 'education', label: '📚 教育培訓' },
+    { key: 'food', label: '🍽 餐飲美食' },
+    { key: 'retail', label: '🛍 零售電商' },
+    { key: 'tech', label: '💻 科技3C' },
+    { key: 'travel', label: '✈️ 旅遊休閒' },
+    { key: 'pet', label: '🐾 寵物相關' },
+    { key: 'psychology', label: '🧠 心理諮商' },
+    { key: 'b2b', label: '🏢 B2B 商務' },
+    { key: 'personal-brand', label: '🌟 個人品牌' },
+    { key: 'parenting', label: '👨‍👩‍👧 親子育兒' },
+    { key: 'entertainment', label: '🎬 娛樂創作' },
+    { key: 'other', label: '🌐 其他產業' }
+  ],
+  // 【新】學習策略標籤（反向篩選核心）
+  learnStrategy: [
+    { key: 'avoid-same-industry', label: '🚫 同業避開', desc: '如果客戶是同產業，不要複製這個形式', color: '#A51820' },
+    { key: 'cross-industry-inspire', label: '💡 跨業學習', desc: '其他產業可以借鏡這個形式', color: '#2E6B2E' },
+    { key: 'universal', label: '🌐 通用範本', desc: '幾乎所有產業都能用', color: '#4A90E2' },
+    { key: 'niche-only', label: '🎯 僅限該產業', desc: '換產業會不適合，不通用', color: '#7A5A5E' }
   ]
 };
 
@@ -3944,15 +4011,92 @@ ${AI.generateShootingNotes(d, d.generatedScripts).map(n => '• ' + n).join('\n'
 }
 
 // ═══════════════════════════════════════════════════════════
-// 【新】餵養庫 (Feed Library) - 整合趨勢雷達的 localStorage
+// 【V4 新】餵養庫 2.0 - 三區架構（暫存/正式/核心）
 // ═══════════════════════════════════════════════════════════
 const FEED_STORAGE_KEY = 'script_gen_feed_items';
 const RADAR_STORAGE_KEY = 'trend_radar_items'; // 趨勢雷達的key（若存在則自動整合）
 
+// Firestore collection 名稱（對應 Firebase 安全規則）
+const FEED_COLLECTION = 'feed_items';
+
+// 三區狀態
+const ZONE_DRAFT = 'draft';       // 🟡 暫存區 - 未完整分析
+const ZONE_OFFICIAL = 'official'; // 🟢 正式資料庫 - 已深度拆解
+const ZONE_CORE = 'core';         // 🔴 核心案例庫 - 提案武器
+
+// 預設欄位結構（V4 深度版）
+const DEFAULT_FEED_ITEM = {
+  // ───── 區域狀態 ─────
+  zone: ZONE_DRAFT,  // draft / official / core
+  
+  // ───── A. 來源資訊 ─────
+  platform: 'instagram',
+  otherPlatformName: '',  // 【新】選「其他」時的自由輸入
+  url: '',              // 🔗 原始連結（可點回看）
+  accountName: '',      // 帳號名稱
+  sourceNote: '',       // 看到的情境備註
+  publishDate: '',      // 發布日期
+  videoLength: 0,       // 影片秒數
+  
+  // ───── B. 成效數據 ─────
+  views: '',            // 觀看數
+  likes: '',            // 按讚
+  comments: '',         // 留言
+  shares: '',           // 分享
+  performance: 'unsure', // 成效等級
+  virality: '',         // 傳播速度（例：3天破百萬）
+  
+  // ───── C. 鉤子深度 ─────
+  hookText: '',         // 前3秒逐字稿
+  hookVisual: '',       // 前3秒畫面描述
+  hookType: '',         // 鉤子類型
+  
+  // ───── D. 結構拆解（Gemini 產出貼進來）─────
+  timeline: '',         // 時間軸（每段秒數+做什麼）
+  rhythmDelivery: '',   // 節奏口白對上的音樂拍子
+  editingPace: '',      // 剪輯節奏（快/慢、跳接、轉場）
+  audioEmotion: '',     // 音效與情緒狀態
+  ctaText: '',          // CTA 逐字稿
+  ctaStrength: '',      // CTA 強度（軟/中/強）
+  
+  // ───── E. 爆紅邏輯（你的洞察）─────
+  whyViral: '',         // 為什麼紅（3個原因）
+  formCopyable: '',     // 形式可學
+  contentNotCopy: '',   // 內容不能搬
+  
+  // ───── F. 成效審查標籤 ⭐ ─────
+  effectType: '',       // viral-spread / conversion / brand-trust / entertainment
+  conversionPrediction: '', // high / medium / low
+  clientStage: [],      // cold-start / growth / harvest（可複選）
+  
+  // ───── G. 產業 & 學習策略 ⭐ ─────
+  industry: '',         // 原產業
+  targetPlatform: '',   // 原平台（冗餘欄位，方便查詢）
+  learnStrategy: '',    // avoid-same-industry / cross-industry-inspire / universal / niche-only
+  
+  // ───── H. 內容類型（既有）─────
+  contentType: 'knowledge',
+  
+  // ───── I. 我的洞察 ─────
+  keyQuote: '',         // 核心金句
+  mainLesson: '',       // 一句話學到的事
+  notes: '',            // 其他備註
+  
+  // ───── 系統欄位 ─────
+  fromRadar: false,
+  createdAt: '',
+  updatedAt: ''
+};
+
 const feedManager = {
   items: [],
   activeTab: 'add',
+  activeZoneFilter: 'all',  // 'all' / 'draft' / 'official' / 'core'
+  activeIndustryFilter: 'all',
+  activePlatformFilter: 'all',
+  inputMode: 'quick',       // 'quick' / 'deep'
   firebaseReady: false,
+  editingItemId: null,      // 正在編輯/升級的 item
   
   init() {
     // 先從 localStorage 載入（瞬間可用）
@@ -3978,21 +4122,16 @@ const feedManager = {
       if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 載入雲端資料...');
       
       // 訂閱 feed_items 集合（即時同步）
-      const q = FB.query(FB.collection(FB.db, 'feed_items'), FB.orderBy('createdAt', 'desc'));
+      const q = FB.query(FB.collection(FB.db, FEED_COLLECTION), FB.orderBy('createdAt', 'desc'));
       
       FB.onSnapshot(q, (snapshot) => {
         const cloudItems = [];
         snapshot.forEach(docSnap => {
           const data = docSnap.data();
           cloudItems.push({
+            ...DEFAULT_FEED_ITEM,
+            ...data,
             id: docSnap.id,
-            platform: data.platform || 'instagram',
-            performance: data.performance || 'solid',
-            contentType: data.contentType || 'knowledge',
-            hookText: data.hookText || '',
-            url: data.url || '',
-            notes: data.notes || '',
-            fromRadar: data.fromRadar || false,
             createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAtString || new Date().toISOString()
           });
         });
@@ -4005,7 +4144,7 @@ const feedManager = {
         this.updateBadge();
         // 如果餵養庫面板開著，更新顯示
         const panel = document.getElementById('feedPanel');
-        if (panel && panel.classList.contains('open') && this.activeTab === 'list') {
+        if (panel && panel.classList.contains('open')) {
           this.renderTab();
         }
         if (window.syncStatus) window.syncStatus.set('connected', `☁️ 已同步 ${cloudItems.length} 筆`);
@@ -4024,7 +4163,15 @@ const feedManager = {
     // 載入本機備份（快速顯示，之後會被雲端資料覆蓋）
     try {
       const own = localStorage.getItem(FEED_STORAGE_KEY);
-      if (own) this.items = JSON.parse(own);
+      if (own) {
+        const parsed = JSON.parse(own);
+        // 舊資料遷移：給舊版資料加上 zone
+        this.items = parsed.map(item => ({
+          ...DEFAULT_FEED_ITEM,
+          ...item,
+          zone: item.zone || (item.hookText && item.hookText.length > 10 ? ZONE_OFFICIAL : ZONE_DRAFT)
+        }));
+      }
     } catch(e) { this.items = []; }
     
     // 嘗試整合趨勢雷達的資料（如有）
@@ -4036,6 +4183,7 @@ const feedManager = {
           radarItems.forEach(r => {
             if (!this.items.find(i => i.id === r.id)) {
               this.items.push({
+                ...DEFAULT_FEED_ITEM,
                 id: r.id || ('radar_' + Date.now() + Math.random()),
                 platform: r.platform || 'instagram',
                 performance: r.performance || 'solid',
@@ -4044,6 +4192,7 @@ const feedManager = {
                 url: r.url || '',
                 notes: r.notes || r.insight || '',
                 fromRadar: true,
+                zone: ZONE_DRAFT,
                 createdAt: r.createdAt || new Date().toISOString()
               });
             }
@@ -4067,13 +4216,10 @@ const feedManager = {
   
   async add(item) {
     const newItem = {
-      platform: item.platform || 'instagram',
-      performance: item.performance || 'solid',
-      contentType: item.contentType || 'knowledge',
-      hookText: item.hookText || '',
-      url: item.url || '',
-      notes: item.notes || '',
-      createdAtString: new Date().toISOString()
+      ...DEFAULT_FEED_ITEM,
+      ...item,
+      createdAtString: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
     // 優先寫入雲端
@@ -4081,11 +4227,10 @@ const feedManager = {
       try {
         if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 上傳中...');
         const FB = window.__FIREBASE__;
-        await FB.addDoc(FB.collection(FB.db, 'feed_items'), {
+        await FB.addDoc(FB.collection(FB.db, FEED_COLLECTION), {
           ...newItem,
           createdAt: FB.serverTimestamp()
         });
-        // 不手動更新 items，因為 onSnapshot 會自動同步
         return;
       } catch(e) {
         console.error('[Firebase] 新增失敗，改用本機:', e);
@@ -4093,7 +4238,7 @@ const feedManager = {
       }
     }
     
-    // 本機後備方案（離線時或雲端失敗時）
+    // 本機後備方案
     this.items.unshift({
       id: 'feed_' + Date.now(),
       ...newItem,
@@ -4103,14 +4248,39 @@ const feedManager = {
     this.updateBadge();
   },
   
+  // 【新】更新已存的項目（升級 / 編輯）
+  async update(id, updates) {
+    const newData = { ...updates, updatedAt: new Date().toISOString() };
+    
+    if (this.firebaseReady && window.__FIREBASE__ && !id.startsWith('feed_') && !id.startsWith('radar_')) {
+      try {
+        if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 更新中...');
+        const FB = window.__FIREBASE__;
+        // Firestore 需要用 setDoc 或 updateDoc，但我們先用重寫的方式
+        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
+        await updateDoc(FB.doc(FB.db, FEED_COLLECTION, id), newData);
+        return;
+      } catch(e) {
+        console.error('[Firebase] 更新失敗:', e);
+        if (window.syncStatus) window.syncStatus.set('error', '⚠️ 雲端更新失敗');
+      }
+    }
+    
+    // 本機更新
+    const idx = this.items.findIndex(i => i.id === id);
+    if (idx >= 0) {
+      this.items[idx] = { ...this.items[idx], ...newData };
+      this.saveLocal();
+    }
+  },
+  
   async remove(id) {
     // 優先從雲端刪除
     if (this.firebaseReady && window.__FIREBASE__ && !id.startsWith('feed_') && !id.startsWith('radar_')) {
       try {
         if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 刪除中...');
         const FB = window.__FIREBASE__;
-        await FB.deleteDoc(FB.doc(FB.db, 'feed_items', id));
-        // onSnapshot 會自動同步
+        await FB.deleteDoc(FB.doc(FB.db, FEED_COLLECTION, id));
         return;
       } catch(e) {
         console.error('[Firebase] 刪除失敗:', e);
@@ -4163,61 +4333,306 @@ const feedManager = {
   },
   
   renderAddForm() {
+    const mode = this.inputMode;
     return `
+      <!-- 模式切換 -->
+      <div style="display:flex;gap:4px;background:var(--bg-card);padding:4px;border-radius:8px;margin-bottom:16px;">
+        <button class="feed-mode-btn ${mode === 'quick' ? 'active' : ''}" data-mode="quick" 
+          style="flex:1;padding:10px 12px;border:none;border-radius:6px;background:${mode === 'quick' ? 'white' : 'transparent'};color:${mode === 'quick' ? 'var(--primary)' : 'var(--text-muted)'};font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;box-shadow:${mode === 'quick' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'};">
+          ⚡ 快速存（30 秒）
+        </button>
+        <button class="feed-mode-btn ${mode === 'deep' ? 'active' : ''}" data-mode="deep"
+          style="flex:1;padding:10px 12px;border:none;border-radius:6px;background:${mode === 'deep' ? 'white' : 'transparent'};color:${mode === 'deep' ? 'var(--primary)' : 'var(--text-muted)'};font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;box-shadow:${mode === 'deep' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'};">
+          🔬 深度拆解（3-5 分鐘）
+        </button>
+      </div>
+      
+      <!-- 模式說明 -->
+      ${mode === 'quick' ? `
+        <div style="background:#FFF8E1;border-left:3px solid #FFC107;padding:12px 14px;border-radius:6px;margin-bottom:16px;font-size:12px;line-height:1.6;">
+          <strong>🟡 暫存區</strong>：只填最重要的欄位，先把影片存下來，之後有時間再深度分析。
+          <br>暫存的影片<strong>不會</strong>被腳本產生器調用，直到你升級為「正式」。
+        </div>
+      ` : `
+        <div style="background:#E8F5E9;border-left:3px solid #4CAF50;padding:12px 14px;border-radius:6px;margin-bottom:16px;font-size:12px;line-height:1.6;">
+          <strong>🟢 正式資料庫</strong>：完整拆解的影片，才會被腳本產生器智慧調用。
+          <br>建議搭配 Gemini 影片分析使用，下方有一鍵複製的提示詞。
+        </div>
+      `}
+
       <div class="feed-form">
+        ${mode === 'deep' ? `
+        <!-- Gemini 一鍵智慧解析 ⭐ 核心功能 -->
+        <div style="background:linear-gradient(135deg, var(--bg-pink) 0%, #FDF3F4 100%);border:2px solid var(--primary);padding:16px;border-radius:12px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:24px;">✨</span>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--primary);">GEMINI 一鍵智慧解析</div>
+              <div style="font-size:11px;color:var(--text-muted);">貼上 Gemini 輸出 → 自動填欄位</div>
+            </div>
+          </div>
+          
+          <button type="button" id="copyGeminiPrompt" style="width:100%;padding:10px;background:white;color:var(--primary);border:1px solid var(--primary);border-radius:8px;font-family:inherit;font-weight:600;font-size:12px;cursor:pointer;margin-bottom:8px;">
+            📋 先複製 Gemini 拆解提示詞
+          </button>
+          
+          <textarea id="geminiPasteArea" placeholder="跑完 Gemini 之後，把整段分析結果貼在這裡..." 
+            style="width:100%;min-height:100px;padding:10px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:12px;line-height:1.5;resize:vertical;box-sizing:border-box;"></textarea>
+          
+          <button type="button" id="autoParseBtn" style="width:100%;padding:12px;background:var(--primary);color:white;border:none;border-radius:8px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;margin-top:8px;">
+            ✨ 智慧解析 → 自動填下方欄位
+          </button>
+          
+          <div style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.5;">
+            💡 解析後所有欄位你都可以再微調，AI 只是幫你省時間
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- ========== 區段 A：來源資訊 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:8px 0;">
+          📱 來源資訊
+        </div>
+        
+        <!-- V4.1 平台按群組顯示 -->
         <div class="input-group">
-          <label class="input-label">📱 平台</label>
-          <div class="feed-platforms-grid">
-            ${FEED_CATEGORIES.platforms.map(p => `
-              <div class="feed-platform-chip" data-feed-platform="${p.key}">
-                ${p.icon} ${p.label}
+          <label class="input-label">平台 <span style="color:var(--primary);">*</span></label>
+          
+          ${FEED_CATEGORIES.platformGroups.map(group => `
+            <div style="margin-bottom:10px;">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;letter-spacing:1px;">
+                ${group.label} · ${group.desc}
               </div>
-            `).join('')}
+              <div class="feed-platforms-grid">
+                ${FEED_CATEGORIES.platforms.filter(p => p.group === group.key).map(p => `
+                  <div class="feed-platform-chip" data-feed-platform="${p.key}">
+                    ${p.icon} ${p.label}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+          
+          <!-- 其他平台的自由輸入（預設隱藏）-->
+          <div id="otherPlatformWrap" style="display:none;margin-top:10px;padding:12px;background:#FFF8E1;border-radius:8px;border-left:3px solid #FFC107;">
+            <label class="input-label" style="font-size:12px;">這是哪個平台/來源？</label>
+            <input type="text" class="text-input" id="feedOtherPlatform" 
+              placeholder="例：電視廣告、雜誌內頁、podcast、朋友傳給我的..." 
+              style="font-size:13px;">
           </div>
         </div>
         
         <div class="input-group">
-          <label class="input-label">🔗 貼文連結（選填）</label>
-          <input type="url" class="text-input" id="feedUrl" placeholder="https://...">
+          <label class="input-label">🔗 原始連結 <span style="color:var(--primary);">*</span></label>
+          <input type="url" class="text-input" id="feedUrl" placeholder="https://www.instagram.com/reel/..." style="font-size:13px;">
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">之後可以直接點連結回看原貼文</div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">👤 帳號名稱</label>
+          <input type="text" class="text-input" id="feedAccountName" placeholder="@yanchonng（烟囪）" style="font-size:13px;">
         </div>
         
         <div class="input-group">
-          <label class="input-label">🎣 鉤子文案（重點！）</label>
-          <textarea class="textarea-input" id="feedHook" placeholder="這支影片/貼文的開頭怎麼寫？抓住你的那句話是什麼？"></textarea>
+          <label class="input-label">🏭 原產業 <span style="color:var(--primary);">*</span></label>
+          <select class="select-input" id="feedIndustry" style="font-size:13px;">
+            <option value="">請選擇...</option>
+            ${FEED_CATEGORIES.industries.map(i => `
+              <option value="${i.key}">${i.label}</option>
+            `).join('')}
+          </select>
+        </div>
+
+        ${mode === 'deep' ? `
+        <div class="input-group">
+          <label class="input-label">📅 看到時的情境備註</label>
+          <input type="text" class="text-input" id="feedSourceNote" placeholder="例：在首頁滑到 / 朋友分享 / 競品研究" style="font-size:13px;">
+        </div>
+        ` : ''}
+
+        <!-- ========== 區段 C：鉤子 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          🎣 鉤子 ${mode === 'quick' ? '（必填）' : '（前 3 秒）'}
         </div>
         
         <div class="input-group">
-          <label class="input-label">📊 成效等級</label>
-          <select class="select-input" id="feedPerformance">
+          <label class="input-label">鉤子文案逐字稿 <span style="color:var(--primary);">*</span></label>
+          <textarea class="textarea-input" id="feedHook" placeholder="影片前 3 秒的開頭句子是什麼？" style="min-height:70px;"></textarea>
+        </div>
+
+        ${mode === 'deep' ? `
+        <div class="input-group">
+          <label class="input-label">畫面描述</label>
+          <textarea class="textarea-input" id="feedHookVisual" placeholder="例：主角在廚房對著鏡頭，背後有虧損截圖" style="min-height:50px;"></textarea>
+        </div>
+        ` : ''}
+
+        <!-- ========== 區段 B：成效 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          📊 成效數據
+        </div>
+        
+        <div class="input-group">
+          <label class="input-label">成效等級</label>
+          <select class="select-input" id="feedPerformance" style="font-size:13px;">
             ${FEED_CATEGORIES.performance.map(p => `
               <option value="${p.key}">${p.label}</option>
             `).join('')}
           </select>
         </div>
-        
+
+        ${mode === 'deep' ? `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="input-group">
+            <label class="input-label">👁 觀看</label>
+            <input type="text" class="text-input" id="feedViews" placeholder="45.2萬" style="font-size:13px;">
+          </div>
+          <div class="input-group">
+            <label class="input-label">❤️ 讚</label>
+            <input type="text" class="text-input" id="feedLikes" placeholder="4.2萬" style="font-size:13px;">
+          </div>
+          <div class="input-group">
+            <label class="input-label">💬 留言</label>
+            <input type="text" class="text-input" id="feedComments" placeholder="582" style="font-size:13px;">
+          </div>
+          <div class="input-group">
+            <label class="input-label">🔁 分享</label>
+            <input type="text" class="text-input" id="feedShares" placeholder="779" style="font-size:13px;">
+          </div>
+        </div>
+        ` : ''}
+
+        ${mode === 'deep' ? `
+        <!-- ========== 區段 D：結構拆解（Gemini）========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          🔬 結構拆解（Gemini 分析貼進來）
+        </div>
+
         <div class="input-group">
-          <label class="input-label">📝 內容類型</label>
-          <select class="select-input" id="feedContentType">
-            ${FEED_CATEGORIES.contentType.map(c => `
-              <option value="${c.key}">${c.label}</option>
+          <label class="input-label">⏱ 時間軸（逐秒逐字稿）</label>
+          <textarea class="textarea-input" id="feedTimeline" placeholder="00:00-00:08 純音樂無口白&#10;00:09-00:11 「先被套住再研究...」" style="min-height:120px;font-size:12px;font-family:monospace;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🎵 節奏口白對拍（你特別要的）</label>
+          <textarea class="textarea-input" id="feedRhythm" placeholder="例：每句末尾字對齊重拍（習、急、局、迷...）" style="min-height:60px;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🎬 剪輯節奏</label>
+          <textarea class="textarea-input" id="feedEditingPace" placeholder="例：快節奏跳接，每 1-2 秒換一個動作" style="min-height:50px;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🔊 音效與情緒曲線</label>
+          <textarea class="textarea-input" id="feedAudioEmotion" placeholder="例：重低音背景音樂，主角從瘋狂到嚴肅收尾" style="min-height:50px;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">📢 CTA 逐字稿</label>
+          <input type="text" class="text-input" id="feedCtaText" placeholder="關注我獲取更多理財建議" style="font-size:13px;">
+        </div>
+
+        <!-- ========== 區段 E：爆紅邏輯 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          💡 爆紅邏輯（你的分析）
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">為什麼紅（3 個原因）</label>
+          <textarea class="textarea-input" id="feedWhyViral" placeholder="1. 反差美學（虧損 + 節奏）&#10;2. 視聽同步產生愉悅感&#10;3. 荒謬梗引發討論" style="min-height:80px;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">✅ 形式可學（客戶可以學什麼）</label>
+          <textarea class="textarea-input" id="feedFormCopyable" placeholder="節奏感、自嘲邏輯、反差結構" style="min-height:50px;"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">❌ 內容不能搬（要避開什麼）</label>
+          <textarea class="textarea-input" id="feedContentNotCopy" placeholder="不要用他的音樂、動作、身份" style="min-height:50px;"></textarea>
+        </div>
+
+        <!-- ========== 區段 F：成效審查標籤 ⭐ ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          🏷️ 成效審查（你的差異化）
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">效果類型</label>
+          <div class="feed-platforms-grid" style="grid-template-columns:repeat(2, 1fr);">
+            ${FEED_CATEGORIES.effectType.map(e => `
+              <div class="feed-platform-chip" data-feed-effect-type="${e.key}" title="${e.desc}">
+                ${e.label}
+              </div>
             `).join('')}
-          </select>
+          </div>
         </div>
-        
+
         <div class="input-group">
-          <label class="input-label">💡 觀察筆記</label>
-          <textarea class="textarea-input" id="feedNotes" placeholder="為什麼這個紅？有什麼可以學的？"></textarea>
+          <label class="input-label">轉換預測</label>
+          <div class="feed-platforms-grid" style="grid-template-columns:repeat(3, 1fr);">
+            ${FEED_CATEGORIES.conversionPrediction.map(c => `
+              <div class="feed-platform-chip" data-feed-conversion="${c.key}" title="${c.desc}">
+                ${c.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- ========== 區段 G：學習策略（反向篩選核心）========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          🎯 學習策略（反向篩選）
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">這支對你的意義</label>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            ${FEED_CATEGORIES.learnStrategy.map(l => `
+              <div class="feed-learn-chip" data-feed-learn="${l.key}" 
+                style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.2s;">
+                <div style="font-weight:600;font-size:13px;margin-bottom:2px;">${l.label}</div>
+                <div style="font-size:11px;color:var(--text-muted);">${l.desc}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- ========== 區段 I：我的洞察 ========== -->
+        <div style="font-size:11px;font-weight:700;color:var(--primary);letter-spacing:2px;margin:16px 0 8px;">
+          ✍️ 我的洞察
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">💎 核心金句</label>
+          <input type="text" class="text-input" id="feedKeyQuote" placeholder="例：先被套住再研究，才是最快的學習" style="font-size:13px;">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">🧠 一句話學到的事</label>
+          <textarea class="textarea-input" id="feedMainLesson" placeholder="把枯燥的台詞韻律化，讓動作對準音樂節奏" style="min-height:60px;"></textarea>
+        </div>
+        ` : ''}
+
+        <div class="input-group">
+          <label class="input-label">💬 備註</label>
+          <textarea class="textarea-input" id="feedNotes" placeholder="${mode === 'quick' ? '一句話備註你為什麼想存（選填）' : '其他觀察與筆記'}" style="min-height:50px;"></textarea>
         </div>
         
-        <button class="btn btn-primary" id="feedAddBtn" style="width:100%;">
-          ✦ 加入餵養庫
+        <button class="btn btn-primary" id="feedAddBtn" style="width:100%;margin-top:8px;padding:14px;font-size:14px;">
+          ${mode === 'quick' ? '⚡ 存進暫存區' : '🔬 存進正式資料庫'}
         </button>
       </div>
     `;
   },
   
   renderList() {
-    if (this.items.length === 0) {
+    const total = this.items.length;
+    const draftCount = this.items.filter(i => i.zone === ZONE_DRAFT).length;
+    const officialCount = this.items.filter(i => i.zone === ZONE_OFFICIAL).length;
+    const coreCount = this.items.filter(i => i.zone === ZONE_CORE).length;
+    
+    if (total === 0) {
       return `
         <div class="feed-empty">
           <div class="big-icon">📭</div>
@@ -4226,30 +4641,119 @@ const feedManager = {
         </div>
       `;
     }
-    return `
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
-        已累積 <strong style="color:var(--primary);">${this.items.length}</strong> 筆靈感
+
+    // 三區統計卡
+    const statsHtml = `
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;margin-bottom:16px;">
+        <div class="feed-zone-stat ${this.activeZoneFilter === 'all' ? 'active' : ''}" data-zone-filter="all"
+          style="padding:10px 6px;border-radius:8px;text-align:center;cursor:pointer;border:1px solid var(--border);${this.activeZoneFilter === 'all' ? 'background:var(--primary);color:white;' : 'background:white;'}">
+          <div style="font-size:18px;font-weight:700;">${total}</div>
+          <div style="font-size:10px;">總量</div>
+        </div>
+        <div class="feed-zone-stat ${this.activeZoneFilter === ZONE_DRAFT ? 'active' : ''}" data-zone-filter="${ZONE_DRAFT}"
+          style="padding:10px 6px;border-radius:8px;text-align:center;cursor:pointer;border:1px solid #FFC107;${this.activeZoneFilter === ZONE_DRAFT ? 'background:#FFC107;color:white;' : 'background:#FFF8E1;'}">
+          <div style="font-size:18px;font-weight:700;">${draftCount}</div>
+          <div style="font-size:10px;">🟡 暫存</div>
+        </div>
+        <div class="feed-zone-stat ${this.activeZoneFilter === ZONE_OFFICIAL ? 'active' : ''}" data-zone-filter="${ZONE_OFFICIAL}"
+          style="padding:10px 6px;border-radius:8px;text-align:center;cursor:pointer;border:1px solid #4CAF50;${this.activeZoneFilter === ZONE_OFFICIAL ? 'background:#4CAF50;color:white;' : 'background:#E8F5E9;'}">
+          <div style="font-size:18px;font-weight:700;">${officialCount}</div>
+          <div style="font-size:10px;">🟢 正式</div>
+        </div>
+        <div class="feed-zone-stat ${this.activeZoneFilter === ZONE_CORE ? 'active' : ''}" data-zone-filter="${ZONE_CORE}"
+          style="padding:10px 6px;border-radius:8px;text-align:center;cursor:pointer;border:1px solid var(--primary);${this.activeZoneFilter === ZONE_CORE ? 'background:var(--primary);color:white;' : 'background:var(--bg-pink);'}">
+          <div style="font-size:18px;font-weight:700;">${coreCount}</div>
+          <div style="font-size:10px;">🔴 核心</div>
+        </div>
       </div>
-      ${this.items.map(item => {
-        const platform = FEED_CATEGORIES.platforms.find(p => p.key === item.platform);
-        const perf = FEED_CATEGORIES.performance.find(p => p.key === item.performance);
-        const type = FEED_CATEGORIES.contentType.find(c => c.key === item.contentType);
-        return `
-          <div class="feed-item-card">
-            <div class="feed-item-head">
-              <span class="feed-item-platform">${platform?.icon || ''} ${platform?.label || ''}</span>
-              <button class="feed-item-delete" data-delete-feed="${item.id}">🗑</button>
-            </div>
-            <div class="feed-item-hook">${item.hookText || '(無鉤子)'}</div>
-            <div class="feed-item-meta">
-              <span style="color:${perf?.color || 'var(--text-muted)'};font-weight:600;">${perf?.label || ''}</span> · ${type?.label || ''}
-              ${item.notes ? '<br>💡 ' + item.notes : ''}
-              ${item.url ? '<br><a href="' + item.url + '" target="_blank" style="color:var(--primary);">看原貼文</a>' : ''}
-              ${item.fromRadar ? '<br><span style="font-size:10px;color:var(--text-light);">📡 來自趨勢雷達</span>' : ''}
-            </div>
+    `;
+
+    // 篩選資料
+    let filtered = this.items;
+    if (this.activeZoneFilter !== 'all') {
+      filtered = filtered.filter(i => i.zone === this.activeZoneFilter);
+    }
+
+    if (filtered.length === 0) {
+      return `
+        ${statsHtml}
+        <div class="feed-empty" style="padding:30px 20px;">
+          <div class="big-icon" style="font-size:36px;">🔍</div>
+          <div>這一區還沒有資料</div>
+        </div>
+      `;
+    }
+
+    return `
+      ${statsHtml}
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+        顯示 <strong style="color:var(--primary);">${filtered.length}</strong> 筆
+      </div>
+      ${filtered.map(item => this.renderFeedItemCard(item)).join('')}
+    `;
+  },
+
+  // 單張卡片的渲染（抽出來重用）
+  renderFeedItemCard(item) {
+    const platform = FEED_CATEGORIES.platforms.find(p => p.key === item.platform);
+    const perf = FEED_CATEGORIES.performance.find(p => p.key === item.performance);
+    const type = FEED_CATEGORIES.contentType.find(c => c.key === item.contentType);
+    const industry = FEED_CATEGORIES.industries.find(i => i.key === item.industry);
+    const effectType = FEED_CATEGORIES.effectType.find(e => e.key === item.effectType);
+    const learn = FEED_CATEGORIES.learnStrategy.find(l => l.key === item.learnStrategy);
+    
+    const zoneColors = {
+      [ZONE_DRAFT]: { bg: '#FFF8E1', border: '#FFC107', label: '🟡 暫存' },
+      [ZONE_OFFICIAL]: { bg: '#E8F5E9', border: '#4CAF50', label: '🟢 正式' },
+      [ZONE_CORE]: { bg: 'var(--bg-pink)', border: 'var(--primary)', label: '🔴 核心' }
+    };
+    const zoneStyle = zoneColors[item.zone] || zoneColors[ZONE_DRAFT];
+    
+    return `
+      <div class="feed-item-card" style="border-left:4px solid ${zoneStyle.border};">
+        <div class="feed-item-head">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <span class="feed-item-platform">${platform?.icon || ''} ${platform?.label || ''}</span>
+            <span style="font-size:10px;padding:2px 6px;background:${zoneStyle.bg};border-radius:4px;font-weight:600;">${zoneStyle.label}</span>
+            ${industry ? `<span style="font-size:10px;color:var(--text-muted);">${industry.label}</span>` : ''}
           </div>
-        `;
-      }).join('')}
+          <div style="display:flex;gap:4px;">
+            ${item.zone === ZONE_DRAFT ? `
+              <button class="feed-item-upgrade" data-upgrade-feed="${item.id}" 
+                style="background:#4CAF50;border:none;color:white;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-weight:600;">
+                ⬆ 升級深度版
+              </button>
+            ` : ''}
+            ${item.zone === ZONE_OFFICIAL ? `
+              <button class="feed-item-promote" data-promote-feed="${item.id}" 
+                style="background:var(--primary);border:none;color:white;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-weight:600;" title="升級為核心案例（提案武器）">
+                ⭐ 設為核心
+              </button>
+            ` : ''}
+            ${item.zone === ZONE_CORE ? `
+              <button class="feed-item-demote" data-demote-feed="${item.id}" 
+                style="background:#888;border:none;color:white;padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-weight:600;" title="取消核心案例">
+                ↓ 取消核心
+              </button>
+            ` : ''}
+            <button class="feed-item-delete" data-delete-feed="${item.id}">🗑</button>
+          </div>
+        </div>
+        ${item.accountName ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">👤 ${item.accountName}</div>` : ''}
+        <div class="feed-item-hook">${item.hookText || '(無鉤子)'}</div>
+        <div class="feed-item-meta">
+          ${perf ? `<span style="color:${perf?.color || 'var(--text-muted)'};font-weight:600;">${perf?.label || ''}</span>` : ''}
+          ${type ? ` · ${type.label}` : ''}
+          ${effectType ? `<br><span style="display:inline-block;margin-top:4px;padding:2px 8px;background:${effectType.color}22;color:${effectType.color};border-radius:4px;font-size:10px;font-weight:600;">${effectType.label}</span>` : ''}
+          ${learn ? ` <span style="display:inline-block;padding:2px 8px;background:${learn.color}22;color:${learn.color};border-radius:4px;font-size:10px;font-weight:600;">${learn.label}</span>` : ''}
+          ${item.views ? `<br>👁 ${item.views}${item.likes ? ' · ❤️ ' + item.likes : ''}${item.comments ? ' · 💬 ' + item.comments : ''}${item.shares ? ' · 🔁 ' + item.shares : ''}` : ''}
+          ${item.keyQuote ? '<br>💎 <em>"' + item.keyQuote + '"</em>' : ''}
+          ${item.mainLesson ? '<br>🧠 ' + item.mainLesson : ''}
+          ${item.notes ? '<br>💬 ' + item.notes : ''}
+          ${item.url ? '<br><a href="' + item.url + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation(); window.open(\'' + item.url + '\', \'_blank\'); return false;" style="color:var(--primary);text-decoration:underline;">🔗 看原貼文</a>' : ''}
+          ${item.fromRadar ? '<br><span style="font-size:10px;color:var(--text-light);">📡 來自趨勢雷達</span>' : ''}
+        </div>
+      </div>
     `;
   },
   
@@ -4263,44 +4767,66 @@ const feedManager = {
             左下角綠色指示燈代表連線正常。
           </span>
         </div>
-        
-        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin-bottom:12px;">📚 餵養庫是什麼？</h4>
-        <p style="margin-bottom:16px;">
-          當你在 IG、TikTok、小紅書看到表現好的內容，把它的<strong>鉤子文案</strong>、成效等級、觀察筆記記錄進來。
-          產出 10 組腳本時，系統會參考你餵養的資料，讓腳本更貼近市場上實際有效的內容。
+
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin-bottom:12px;">🎯 V2.0 三區架構</h4>
+        <div style="background:#FFF8E1;border-left:4px solid #FFC107;padding:12px;border-radius:6px;margin-bottom:10px;">
+          <strong>🟡 暫存區</strong>：滑 IG 時快速存（30 秒）<br>
+          <span style="font-size:12px;color:var(--text-muted);">只填平台、連結、產業、鉤子。不會被腳本產生器調用。</span>
+        </div>
+        <div style="background:#E8F5E9;border-left:4px solid #4CAF50;padding:12px;border-radius:6px;margin-bottom:10px;">
+          <strong>🟢 正式資料庫</strong>：完整拆解（3-5 分鐘）<br>
+          <span style="font-size:12px;color:var(--text-muted);">含時間軸、節奏、音效、爆紅邏輯。會被腳本產生器智慧調用。</span>
+        </div>
+        <div style="background:var(--bg-pink);border-left:4px solid var(--primary);padding:12px;border-radius:6px;margin-bottom:16px;">
+          <strong>🔴 核心案例庫</strong>：你最驕傲的提案武器<br>
+          <span style="font-size:12px;color:var(--text-muted);">手動標星，面對客戶提案時可以直接秀出來。</span>
+        </div>
+
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🔄 推薦工作流</h4>
+        <ol style="padding-left:20px;margin-bottom:16px;">
+          <li style="margin-bottom:8px;">滑 IG 看到爆款 → <strong>快速存進暫存區</strong>（30 秒）</li>
+          <li style="margin-bottom:8px;">每天集中 30 分鐘 → 挑 3-5 筆<strong>升級到深度模式</strong></li>
+          <li style="margin-bottom:8px;">用 Gemini 分析影片 → 貼進深度欄位</li>
+          <li style="margin-bottom:8px;">標記<strong>效果類型、轉換預測、學習策略</strong></li>
+          <li style="margin-bottom:8px;">最棒的 5-10 筆 → <strong>設為核心案例</strong></li>
+          <li style="margin-bottom:8px;">產客戶腳本時 → 系統自動調用正式+核心資料</li>
+        </ol>
+
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🏷️ 成效審查標籤</h4>
+        <p style="margin-bottom:10px;font-size:13px;">
+          每一筆正式資料都要標記<strong>效果類型</strong>——這是你的差異化核心：
         </p>
-        
-        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🔄 雙向循環</h4>
-        <ul style="padding-left:20px;margin-bottom:16px;">
-          <li style="margin-bottom:6px;">看到好內容 → 存進餵養庫（自動同步雲端）</li>
-          <li style="margin-bottom:6px;">產腳本 → 系統自動參考餵養庫</li>
-          <li style="margin-bottom:6px;">拍攝上架 → 回報成效到餵養庫</li>
-          <li style="margin-bottom:6px;">累積越多 → AI 推薦越準確</li>
+        <ul style="padding-left:20px;margin-bottom:16px;font-size:13px;">
+          <li style="margin-bottom:4px;">🔥 <strong>傳播型</strong>：觸及廣、分享高，但不一定帶業績</li>
+          <li style="margin-bottom:4px;">💰 <strong>轉換型</strong>：引發詢問或購買（給客戶看業績用）</li>
+          <li style="margin-bottom:4px;">⭐ <strong>品牌型</strong>：建立信任與權威</li>
+          <li style="margin-bottom:4px;">😄 <strong>娛樂型</strong>：純娛樂，沒有商業轉換</li>
         </ul>
-        
+
+        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🎯 反向篩選（學習策略）</h4>
+        <p style="margin-bottom:10px;font-size:13px;">
+          每筆資料標記四種類型之一：
+        </p>
+        <ul style="padding-left:20px;margin-bottom:16px;font-size:13px;">
+          <li style="margin-bottom:4px;">🚫 <strong>同業避開</strong>：如果客戶是同產業，不要複製這個形式</li>
+          <li style="margin-bottom:4px;">💡 <strong>跨業學習</strong>：其他產業可以借鏡這個形式</li>
+          <li style="margin-bottom:4px;">🌐 <strong>通用範本</strong>：幾乎所有產業都能用</li>
+          <li style="margin-bottom:4px;">🎯 <strong>僅限該產業</strong>：換產業會不適合</li>
+        </ul>
+
         <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">📱 跨裝置使用</h4>
         <p style="margin-bottom:16px;">
           手機、平板、不同電腦都可以使用，資料會<strong>自動同步</strong>到同一個雲端。
           看到好內容隨手存（手機），回到電腦產腳本時就會看到。
         </p>
-        
-        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🔌 離線備援</h4>
-        <p style="margin-bottom:16px;">
-          沒網路時：系統會自動降到「本機模式」，資料先存瀏覽器。
-          網路恢復後：會在下次打開時重新連接雲端。
-        </p>
-        
-        <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">📡 趨勢雷達整合</h4>
-        <p style="margin-bottom:16px;">
-          如果你已經在用「趨勢雷達」工具，打開餵養庫時會<strong>自動整合</strong>兩邊資料。
-        </p>
-        
+
         <h4 style="font-family:'Noto Serif TC',serif;color:var(--primary);margin:20px 0 12px;">🚀 未來擴充</h4>
         <p style="background:var(--bg-pink);padding:12px;border-radius:8px;font-size:13px;">
-          下一階段（路線 B）可以加入：
-          <br>1. Google 登入，每個人有私人餵養庫
-          <br>2. 團隊共用資料庫（給你的夥伴）
-          <br>3. 輸入 IG 連結 → AI 自動分析帳號風格
+          下一階段可以加入：<br>
+          1. 產業 + 平台智慧篩選儀表板<br>
+          2. 核心案例直接匯出 PDF 提案<br>
+          3. 接 Claude API 真 AI 產腳本<br>
+          4. 剪輯 AI 自動產 Demo 影片給客戶看
         </p>
       </div>
     `;
@@ -4320,41 +4846,483 @@ const feedManager = {
   },
   
   bindAddForm() {
+    // 模式切換
+    document.querySelectorAll('.feed-mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.inputMode = btn.dataset.mode;
+        this.renderTab();
+      });
+    });
+
+    // 【V4.1】Gemini 智慧解析按鈕 ⭐
+    $('autoParseBtn')?.addEventListener('click', () => {
+      const rawText = $('geminiPasteArea')?.value.trim();
+      if (!rawText || rawText.length < 50) {
+        alert('請先貼上 Gemini 的完整分析內容（至少 50 字）');
+        return;
+      }
+      this.parseGeminiOutput(rawText);
+    });
+
+    // Gemini 提示詞複製
+    $('copyGeminiPrompt')?.addEventListener('click', () => {
+      const prompt = `我正在做短影音代理營運，需要拆解一支爆款影片的結構。
+請你用專業分析師的角度，詳細描述這支影片，格式如下：
+
+【基本資訊】
+- 平台 / 帳號 / 產業類別
+- 影片總長幾秒
+- 語言、主角性別年齡
+
+【鉤子段（前 3 秒）】
+- 畫面發生什麼（運鏡、構圖、主角動作、文字）
+- 口白逐字稿（精準到標點）
+- 背景音樂風格（節奏快慢、情緒）
+- 字幕樣式和色調
+
+【中段內容（3-25 秒）】
+- 按時間軸逐段描述畫面（每 3-5 秒一段）
+- 口白逐字稿
+- 運鏡變化、剪輯節奏
+- 節奏口白對拍方式（很重要！每句末尾字是否對齊音樂重拍）
+- 剪輯細節（跳接、轉場、縮放）
+- 音效與情緒狀態
+
+【結尾 CTA（最後 3-5 秒）】
+- 口白逐字稿
+- 畫面怎麼收
+- CTA 強度（軟/中/強）
+
+【視覺風格】
+- 色調、字幕排版、特效
+
+【情緒曲線】
+- 主角情緒變化、觀眾預期情緒
+
+【觀察數據】
+- 觀看、按讚、留言、分享
+
+請用白話文事實性描述，不要用「很有吸引力」這種虛詞。`;
+      
+      navigator.clipboard.writeText(prompt).then(() => {
+        const btn = $('copyGeminiPrompt');
+        const old = btn.textContent;
+        btn.textContent = '✓ 已複製！貼到 Gemini';
+        setTimeout(() => { btn.textContent = old; }, 2000);
+      }).catch(() => {
+        alert('複製失敗，請手動選取');
+      });
+    });
+
+    // 平台選擇（單選 + 其他切換）
     document.querySelectorAll('[data-feed-platform]').forEach(chip => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('[data-feed-platform]').forEach(c => c.classList.remove('selected'));
         chip.classList.add('selected');
+        // 如果選「其他」則顯示自由輸入框
+        const otherWrap = $('otherPlatformWrap');
+        if (otherWrap) {
+          if (chip.dataset.feedPlatform === 'other') {
+            otherWrap.style.display = 'block';
+          } else {
+            otherWrap.style.display = 'none';
+          }
+        }
       });
     });
+
+    // 效果類型（單選）
+    document.querySelectorAll('[data-feed-effect-type]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-feed-effect-type]').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      });
+    });
+
+    // 轉換預測（單選）
+    document.querySelectorAll('[data-feed-conversion]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-feed-conversion]').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+      });
+    });
+
+    // 學習策略（單選）
+    document.querySelectorAll('[data-feed-learn]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-feed-learn]').forEach(c => {
+          c.classList.remove('selected');
+          c.style.background = '';
+          c.style.borderColor = 'var(--border)';
+        });
+        chip.classList.add('selected');
+        chip.style.background = 'var(--bg-pink)';
+        chip.style.borderColor = 'var(--primary)';
+      });
+    });
+
+    // 儲存按鈕
     $('feedAddBtn')?.addEventListener('click', () => {
       const selectedPlatform = document.querySelector('[data-feed-platform].selected');
       if (!selectedPlatform) {
         alert('請選一個平台');
         return;
       }
+      const platformKey = selectedPlatform.dataset.feedPlatform;
+      
+      // 如果是其他，檢查有沒有填名稱
+      let otherPlatformName = '';
+      if (platformKey === 'other') {
+        otherPlatformName = $('feedOtherPlatform')?.value.trim() || '';
+        if (!otherPlatformName) {
+          alert('選了「其他」請填平台名稱');
+          return;
+        }
+      }
+      
       const hook = $('feedHook')?.value.trim();
       if (!hook) {
         alert('鉤子文案不能空，這是最重要的');
         return;
       }
-      this.add({
-        platform: selectedPlatform.dataset.feedPlatform,
-        performance: $('feedPerformance')?.value || 'solid',
-        contentType: $('feedContentType')?.value || 'knowledge',
+      const url = $('feedUrl')?.value.trim();
+      if (!url) {
+        alert('請填原始連結，之後可以回點看原影片');
+        return;
+      }
+      const industry = $('feedIndustry')?.value;
+      if (!industry) {
+        alert('請選擇產業');
+        return;
+      }
+
+      const effectType = document.querySelector('[data-feed-effect-type].selected')?.dataset.feedEffectType || '';
+      const conversionPred = document.querySelector('[data-feed-conversion].selected')?.dataset.feedConversion || '';
+      const learnStrategy = document.querySelector('[data-feed-learn].selected')?.dataset.feedLearn || '';
+
+      // 根據模式決定要存的資料
+      const baseData = {
+        platform: platformKey,
+        otherPlatformName: otherPlatformName,
+        url: url,
+        accountName: $('feedAccountName')?.value.trim() || '',
+        industry: industry,
         hookText: hook,
-        url: $('feedUrl')?.value.trim() || '',
-        notes: $('feedNotes')?.value.trim() || ''
-      });
-      alert('✓ 已加入餵養庫！');
+        performance: $('feedPerformance')?.value || 'unsure',
+        contentType: 'knowledge',  // 預設
+        notes: $('feedNotes')?.value.trim() || '',
+        zone: this.inputMode === 'quick' ? ZONE_DRAFT : ZONE_OFFICIAL
+      };
+
+      // 深度模式才有的欄位
+      if (this.inputMode === 'deep') {
+        Object.assign(baseData, {
+          sourceNote: $('feedSourceNote')?.value.trim() || '',
+          hookVisual: $('feedHookVisual')?.value.trim() || '',
+          views: $('feedViews')?.value.trim() || '',
+          likes: $('feedLikes')?.value.trim() || '',
+          comments: $('feedComments')?.value.trim() || '',
+          shares: $('feedShares')?.value.trim() || '',
+          timeline: $('feedTimeline')?.value.trim() || '',
+          rhythmDelivery: $('feedRhythm')?.value.trim() || '',
+          editingPace: $('feedEditingPace')?.value.trim() || '',
+          audioEmotion: $('feedAudioEmotion')?.value.trim() || '',
+          ctaText: $('feedCtaText')?.value.trim() || '',
+          whyViral: $('feedWhyViral')?.value.trim() || '',
+          formCopyable: $('feedFormCopyable')?.value.trim() || '',
+          contentNotCopy: $('feedContentNotCopy')?.value.trim() || '',
+          keyQuote: $('feedKeyQuote')?.value.trim() || '',
+          mainLesson: $('feedMainLesson')?.value.trim() || '',
+          effectType: effectType,
+          conversionPrediction: conversionPred,
+          learnStrategy: learnStrategy
+        });
+      }
+
+      this.add(baseData);
+      
+      const msg = this.inputMode === 'quick' 
+        ? '✓ 已存進暫存區！有空時記得回來升級為深度版' 
+        : '✓ 已存進正式資料庫！';
+      alert(msg);
+      
       this.activeTab = 'list';
+      this.activeZoneFilter = this.inputMode === 'quick' ? ZONE_DRAFT : ZONE_OFFICIAL;
       document.querySelectorAll('.feed-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.feedTab === 'list');
       });
       this.renderTab();
     });
   },
+
+  // 【V4.1 核心】Gemini 輸出智慧解析
+  parseGeminiOutput(text) {
+    const result = {};
+    let filledCount = 0;
+    
+    // Helper: 從文字中抓取某段落的內容
+    const extractSection = (startMarkers, endMarkers = null) => {
+      for (const start of startMarkers) {
+        const startIdx = text.indexOf(start);
+        if (startIdx === -1) continue;
+        let endIdx = text.length;
+        if (endMarkers) {
+          for (const end of endMarkers) {
+            const i = text.indexOf(end, startIdx + start.length);
+            if (i !== -1 && i < endIdx) endIdx = i;
+          }
+        }
+        return text.substring(startIdx + start.length, endIdx).trim();
+      }
+      return '';
+    };
+
+    // Helper: 從段落中找「XX：」後面的值
+    const extractField = (section, fieldNames) => {
+      for (const field of fieldNames) {
+        const regex = new RegExp(`[\\*\\-•·]?\\s*${field}\\s*[:：]\\s*(.+?)(?:\\n|$)`, 'i');
+        const match = section.match(regex);
+        if (match) return match[1].trim().replace(/^["「『]|["」』]$/g, '');
+      }
+      return '';
+    };
+
+    // 1. 解析基本資訊
+    const basicSection = extractSection(['【基本資訊】', '基本資訊'], ['【', '##']);
+    if (basicSection) {
+      // 平台識別
+      const platformText = extractField(basicSection, ['平台', 'Platform']);
+      if (platformText) {
+        const pt = platformText.toLowerCase();
+        if (pt.includes('instagram') || pt.includes('ig')) result.platform = 'instagram';
+        else if (pt.includes('tiktok') || pt.includes('抖音')) result.platform = 'tiktok';
+        else if (pt.includes('youtube shorts') || pt.includes('yt shorts')) result.platform = 'youtube-shorts';
+        else if (pt.includes('youtube')) result.platform = 'youtube';
+        else if (pt.includes('小紅書') || pt.includes('xiaohongshu') || pt.includes('rednote')) result.platform = 'xiaohongshu';
+        else if (pt.includes('facebook reels') || pt.includes('fb reels')) result.platform = 'facebook-reels';
+        else if (pt.includes('facebook') || pt.includes('fb')) result.platform = 'facebook-video';
+        else if (pt.includes('threads')) result.platform = 'threads';
+        else if (pt.includes('bilibili') || pt.includes('b站')) result.platform = 'bilibili';
+      }
+      
+      // 帳號名稱（從「平台 / 帳號 / 產業」格式抓）
+      const combinedMatch = basicSection.match(/平台\s*[/／]\s*帳號\s*[/／]\s*產業[:：]?\s*[^\n]*?[/／]\s*([^\n/／]+?)\s*[/／]/);
+      if (combinedMatch) {
+        result.accountName = combinedMatch[1].trim();
+      } else {
+        const accMatch = extractField(basicSection, ['帳號', 'Account', '帳號名稱']);
+        if (accMatch) result.accountName = accMatch;
+      }
+      
+      // 產業
+      const industryText = extractField(basicSection, ['產業', '產業類別', 'Industry']) || 
+                           (combinedMatch ? basicSection.match(/[/／]([^\n/／]+?)$/m)?.[1]?.trim() : '');
+      if (industryText) {
+        const it = industryText.toLowerCase();
+        if (it.includes('法律') || it.includes('律師')) result.industry = 'legal';
+        else if (it.includes('醫') || it.includes('健康')) result.industry = 'medical';
+        else if (it.includes('財') || it.includes('金融') || it.includes('股') || it.includes('理財') || it.includes('投資')) result.industry = 'finance';
+        else if (it.includes('美妝') || it.includes('保養')) result.industry = 'beauty';
+        else if (it.includes('健身') || it.includes('運動')) result.industry = 'fitness';
+        else if (it.includes('房') || it.includes('居家')) result.industry = 'realestate';
+        else if (it.includes('美髮') || it.includes('美容')) result.industry = 'haircare';
+        else if (it.includes('醫美') || it.includes('整形')) result.industry = 'aesthetic';
+        else if (it.includes('教育') || it.includes('培訓') || it.includes('教學')) result.industry = 'education';
+        else if (it.includes('餐飲') || it.includes('美食') || it.includes('食')) result.industry = 'food';
+        else if (it.includes('零售') || it.includes('電商')) result.industry = 'retail';
+        else if (it.includes('科技') || it.includes('3c')) result.industry = 'tech';
+        else if (it.includes('旅遊') || it.includes('旅行')) result.industry = 'travel';
+        else if (it.includes('寵物')) result.industry = 'pet';
+        else if (it.includes('心理') || it.includes('諮商')) result.industry = 'psychology';
+        else if (it.includes('b2b') || it.includes('商務')) result.industry = 'b2b';
+        else if (it.includes('個人品牌') || it.includes('kol') || it.includes('自媒體')) result.industry = 'personal-brand';
+        else if (it.includes('親子') || it.includes('育兒')) result.industry = 'parenting';
+        else if (it.includes('娛樂')) result.industry = 'entertainment';
+      }
+      
+      // 影片長度
+      const lengthMatch = basicSection.match(/(\d+)\s*秒/);
+      if (lengthMatch) result.videoLength = parseInt(lengthMatch[1]);
+    }
+
+    // 2. 解析鉤子段
+    const hookSection = extractSection(['【鉤子段', '【鉤子', '鉤子段（前 3 秒）', '鉤子（前3秒）', '鉤子（前 3 秒）'], ['【', '##']);
+    if (hookSection) {
+      // 口白逐字稿
+      const hookQuote = extractField(hookSection, ['口白逐字稿', '口白', '逐字稿', '台詞']);
+      if (hookQuote) {
+        result.hookText = hookQuote.replace(/^["「『]|["」』。，]$/g, '');
+      }
+      // 畫面描述
+      const hookVisual = extractField(hookSection, ['畫面', '畫面發生什麼', '畫面描述']);
+      if (hookVisual) result.hookVisual = hookVisual;
+    }
+
+    // 3. 解析中段內容（放入時間軸）
+    const middleSection = extractSection(['【中段內容', '【中段', '中段內容（3-25', '中段內容'], ['【結尾', '【視覺', '##']);
+    if (middleSection) {
+      result.timeline = middleSection.trim();
+      
+      // 從中段抓節奏口白
+      const rhythm = extractField(middleSection, ['節奏口白', '節奏', '節奏對拍', '節奏呈現', 'Rhythmic Delivery']);
+      if (rhythm) result.rhythmDelivery = rhythm;
+      
+      // 剪輯節奏
+      const pace = extractField(middleSection, ['剪輯節奏', '剪輯', '運鏡', '運鏡變化']);
+      if (pace) result.editingPace = pace;
+    }
+    
+    // 從整段找節奏描述（可能在其他區塊）
+    if (!result.rhythmDelivery) {
+      const rhythmAll = text.match(/(?:節奏|Rhythmic Delivery)[\s:：]*([^\n]{20,200})/);
+      if (rhythmAll) result.rhythmDelivery = rhythmAll[1].trim();
+    }
+
+    // 4. 解析結尾 CTA
+    const ctaSection = extractSection(['【結尾 CTA', '【CTA', '【結尾', 'CTA'], ['【', '##']);
+    if (ctaSection) {
+      const ctaText = extractField(ctaSection, ['口白逐字稿', '台詞', '口白']);
+      if (ctaText) result.ctaText = ctaText.replace(/^["「『]|["」』]$/g, '');
+    }
+
+    // 5. 解析視覺風格 → audioEmotion
+    const audioSection = extractSection(['【情緒曲線', '【音效', '情緒曲線', '音效'], ['【', '##']);
+    if (audioSection) {
+      result.audioEmotion = audioSection.substring(0, 300).trim();
+    }
+
+    // 6. 解析觀察數據
+    const dataSection = extractSection(['【觀察數據', '觀察數據', '【成效', '成效'], ['【', '##']);
+    if (dataSection) {
+      const views = dataSection.match(/(?:觀看|Views?)[^\d]*?([\d.,萬]+)/);
+      if (views) result.views = views[1];
+      const likes = dataSection.match(/(?:按讚|讚|Likes?)[^\d]*?([\d.,萬]+)/);
+      if (likes) result.likes = likes[1];
+      const comments = dataSection.match(/(?:留言|Comments?)[^\d]*?([\d.,萬]+)/);
+      if (comments) result.comments = comments[1];
+      const shares = dataSection.match(/(?:分享|Shares?)[^\d]*?([\d.,萬]+)/);
+      if (shares) result.shares = shares[1];
+    }
+
+    // 7. 從全文抓關鍵字（金句候選）
+    const quoteMatch = text.match(/(?:核心價值|核心|金句)[^「『]*?[「『]([^」』]{5,50})[」』]/);
+    if (quoteMatch) result.keyQuote = quoteMatch[1];
+
+    // === 自動填入欄位 ===
+    if (result.platform) {
+      document.querySelectorAll('[data-feed-platform]').forEach(c => c.classList.remove('selected'));
+      const target = document.querySelector(`[data-feed-platform="${result.platform}"]`);
+      if (target) {
+        target.classList.add('selected');
+        filledCount++;
+      }
+    }
+    
+    if (result.accountName) {
+      const el = $('feedAccountName');
+      if (el) { el.value = result.accountName; filledCount++; }
+    }
+    
+    if (result.industry) {
+      const el = $('feedIndustry');
+      if (el) { el.value = result.industry; filledCount++; }
+    }
+    
+    if (result.hookText) {
+      const el = $('feedHook');
+      if (el) { el.value = result.hookText; filledCount++; }
+    }
+    
+    if (result.hookVisual) {
+      const el = $('feedHookVisual');
+      if (el) { el.value = result.hookVisual; filledCount++; }
+    }
+    
+    if (result.timeline) {
+      const el = $('feedTimeline');
+      if (el) { el.value = result.timeline; filledCount++; }
+    }
+    
+    if (result.rhythmDelivery) {
+      const el = $('feedRhythm');
+      if (el) { el.value = result.rhythmDelivery; filledCount++; }
+    }
+    
+    if (result.editingPace) {
+      const el = $('feedEditingPace');
+      if (el) { el.value = result.editingPace; filledCount++; }
+    }
+    
+    if (result.audioEmotion) {
+      const el = $('feedAudioEmotion');
+      if (el) { el.value = result.audioEmotion; filledCount++; }
+    }
+    
+    if (result.ctaText) {
+      const el = $('feedCtaText');
+      if (el) { el.value = result.ctaText; filledCount++; }
+    }
+    
+    if (result.views) { const el = $('feedViews'); if (el) { el.value = result.views; filledCount++; } }
+    if (result.likes) { const el = $('feedLikes'); if (el) { el.value = result.likes; filledCount++; } }
+    if (result.comments) { const el = $('feedComments'); if (el) { el.value = result.comments; filledCount++; } }
+    if (result.shares) { const el = $('feedShares'); if (el) { el.value = result.shares; filledCount++; } }
+    if (result.keyQuote) { const el = $('feedKeyQuote'); if (el) { el.value = result.keyQuote; filledCount++; } }
+    if (result.videoLength) { filledCount++; }
+
+    // 提示結果
+    if (filledCount === 0) {
+      alert('⚠️ 沒能解析到任何欄位\n\n可能原因：\n- Gemini 輸出格式跟預期不同\n- 請確認有包含【基本資訊】【鉤子段】等標題\n\n你可以手動補填');
+    } else {
+      alert(`✨ 已自動填入 ${filledCount} 個欄位！\n\n請檢查每個欄位是否正確，有需要請手動調整。\n未填到的欄位（如：為什麼紅、成效審查、學習策略）請你手動評估。`);
+    }
+  },
   
   bindList() {
+    // 三區篩選
+    document.querySelectorAll('[data-zone-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.activeZoneFilter = btn.dataset.zoneFilter;
+        this.renderTab();
+      });
+    });
+
+    // 升級為深度版（暫存區 → 正式區）
+    document.querySelectorAll('[data-upgrade-feed]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.upgradeFeed;
+        const item = this.items.find(i => i.id === id);
+        if (!item) return;
+        if (confirm(`要把這筆升級為「正式區」嗎？\n\n升級後會切換到新增頁的深度模式，你需要補齊所有欄位才能真正使用。\n\n（暫時做法：先改變它的 zone 標記，補欄位由你在下次新增時手動處理）`)) {
+          this.update(id, { zone: ZONE_OFFICIAL });
+          alert('已升級為「正式區」。建議之後有空補齊深度欄位。');
+          this.renderTab();
+        }
+      });
+    });
+
+    // 設為核心案例
+    document.querySelectorAll('[data-promote-feed]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.promoteFeed;
+        if (confirm('設為「核心案例」？\n\n這是你最驕傲的提案武器，未來面對客戶時可以直接拿出來秀。')) {
+          this.update(id, { zone: ZONE_CORE });
+          alert('✦ 已設為核心案例！');
+          this.renderTab();
+        }
+      });
+    });
+
+    // 取消核心案例
+    document.querySelectorAll('[data-demote-feed]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.demoteFeed;
+        this.update(id, { zone: ZONE_OFFICIAL });
+        this.renderTab();
+      });
+    });
+
+    // 刪除
     document.querySelectorAll('[data-delete-feed]').forEach(btn => {
       btn.addEventListener('click', () => {
         if (confirm('確定刪除這筆靈感？')) {
@@ -4366,14 +5334,22 @@ const feedManager = {
   },
   
   // 【關鍵】取得相關的餵養靈感，給腳本生成器使用
+  // V4 新版：只從「正式」和「核心」區調用，暫存區不算
   getRelevantInspirations(contentType = null, limit = 3) {
-    let filtered = this.items.filter(i => i.hookText && i.hookText.length > 5);
+    let filtered = this.items.filter(i => 
+      i.hookText && i.hookText.length > 5 && 
+      (i.zone === ZONE_OFFICIAL || i.zone === ZONE_CORE)
+    );
     if (contentType) {
       filtered = filtered.filter(i => i.contentType === contentType);
     }
-    // 依成效排序
-    const perfOrder = { 'viral': 0, 'hot': 1, 'solid': 2, 'niche': 3 };
-    filtered.sort((a, b) => (perfOrder[a.performance] || 99) - (perfOrder[b.performance] || 99));
+    // 核心案例優先 > 依成效排序
+    const perfOrder = { 'viral': 0, 'hot': 1, 'solid': 2, 'niche': 3, 'unsure': 4 };
+    filtered.sort((a, b) => {
+      if (a.zone === ZONE_CORE && b.zone !== ZONE_CORE) return -1;
+      if (b.zone === ZONE_CORE && a.zone !== ZONE_CORE) return 1;
+      return (perfOrder[a.performance] || 99) - (perfOrder[b.performance] || 99);
+    });
     return filtered.slice(0, limit);
   }
 };
