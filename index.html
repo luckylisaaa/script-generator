@@ -6353,5 +6353,55 @@ setTimeout(() => {
 }, 10000);
 </script>
 
-</body>
+<!-- ═══ ICS Navigation Widget ═══ -->
+<style>
+.ics-nav-widget{position:fixed;bottom:20px;right:20px;z-index:9998;font-family:"Noto Sans TC",-apple-system,sans-serif}
+.ics-nav-trigger{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#B51E28,#7A1018);color:#fff;border:none;font-family:"Noto Serif TC",serif;font-size:22px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(165,24,32,.35);transition:all .3s;display:flex;align-items:center;justify-content:center}
+.ics-nav-trigger:hover{transform:scale(1.08)}
+.ics-nav-trigger.active{transform:rotate(45deg);background:#2A1A1C}
+.ics-nav-menu{position:absolute;bottom:72px;right:0;background:#FDFBF8;border:1px solid #E8E3DA;border-radius:8px;padding:16px;min-width:260px;box-shadow:0 16px 48px rgba(42,26,28,.15);opacity:0;transform:translateY(10px);pointer-events:none;transition:all .3s}
+.ics-nav-menu.open{opacity:1;transform:translateY(0);pointer-events:auto}
+.ics-nav-header{font-family:"Noto Serif TC",serif;color:#A51820;font-weight:900;font-size:14px;letter-spacing:2px;margin-bottom:4px;text-align:center}
+.ics-nav-tagline{color:#7A5A5E;font-size:11px;text-align:center;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #E8E3DA;font-style:italic}
+.ics-nav-list{display:flex;flex-direction:column;gap:4px}
+.ics-nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:4px;text-decoration:none;color:#2A1A1C;transition:background .2s;border:1px solid transparent}
+.ics-nav-item:hover{background:#FDF3F4;border-color:#FAE8EA}
+.ics-nav-item.current{background:#FAE8EA;border-color:#A51820;pointer-events:none}
+.ics-nav-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#B51E28,#7A1018);color:#fff;font-family:"Noto Serif TC",serif;font-weight:900;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ics-nav-text{flex:1}
+.ics-nav-name{font-family:"Noto Serif TC",serif;font-weight:700;font-size:14px;color:#2A1A1C}
+.ics-nav-desc{font-size:11px;color:#7A5A5E;margin-top:2px}
+.ics-nav-current-badge{background:#A51820;color:#fff;padding:2px 6px;border-radius:2px;font-size:9px;letter-spacing:1px;margin-left:4px}
+.ics-nav-footer{text-align:center;margin-top:12px;padding-top:12px;border-top:1px solid #E8E3DA;font-size:10px;color:#B09498;letter-spacing:1px}
+</style>
+<div class="ics-nav-widget" id="icsNavWidget">
+<div class="ics-nav-menu" id="icsNavMenu">
+<div class="ics-nav-header">ICS 工具系統</div>
+<div class="ics-nav-tagline">Inspire · Create · Shine</div>
+<div class="ics-nav-list">
+<a href="https://luckylisaaa.github.io/" class="ics-nav-item" data-site="root"><div class="ics-nav-icon">ICS</div><div class="ics-nav-text"><div class="ics-nav-name">首頁</div><div class="ics-nav-desc">Home · 總入口</div></div></a>
+<a href="https://luckylisaaa.github.io/handbook/" class="ics-nav-item" data-site="handbook"><div class="ics-nav-icon">H</div><div class="ics-nav-text"><div class="ics-nav-name">Handbook</div><div class="ics-nav-desc">完整學習手冊</div></div></a>
+<a href="https://luckylisaaa.github.io/matrix/" class="ics-nav-item" data-site="matrix"><div class="ics-nav-icon">M</div><div class="ics-nav-text"><div class="ics-nav-name">Matrix</div><div class="ics-nav-desc">選題作戰矩陣</div></div></a>
+<a href="https://luckylisaaa.github.io/script-generator/" class="ics-nav-item" data-site="scripts"><div class="ics-nav-icon">S</div><div class="ics-nav-text"><div class="ics-nav-name">Scripts</div><div class="ics-nav-desc">腳本產生器 V3</div></div></a>
+<a href="https://luckylisaaa.github.io/brand-guidelines/" class="ics-nav-item" data-site="brand"><div class="ics-nav-icon">B</div><div class="ics-nav-text"><div class="ics-nav-name">Brand</div><div class="ics-nav-desc">品牌視覺規範</div></div></a>
+<a href="https://luckylisaaa.github.io/tasks/" class="ics-nav-item" data-site="tasks"><div class="ics-nav-icon">T</div><div class="ics-nav-text"><div class="ics-nav-name">Tasks</div><div class="ics-nav-desc">執行清單</div></div></a>
+</div>
+<div class="ics-nav-footer">Finding beauty. Making it move.</div>
+</div>
+<button class="ics-nav-trigger" id="icsNavTrigger">+</button>
+</div>
+<script>
+(function(){
+var t=document.getElementById('icsNavTrigger'),m=document.getElementById('icsNavMenu');
+var p=window.location.pathname;
+document.querySelectorAll('.ics-nav-item').forEach(function(i){
+var s=i.getAttribute('data-site');
+var mark=(s==='root'&&(p==='/'||p==='/index.html'))||(s==='handbook'&&p.indexOf('/handbook')!==-1)||(s==='matrix'&&p.indexOf('/matrix')!==-1)||(s==='scripts'&&p.indexOf('/script-generator')!==-1)||(s==='brand'&&p.indexOf('/brand-guidelines')!==-1)||(s==='tasks'&&p.indexOf('/tasks')!==-1);
+if(mark){i.classList.add('current');var b=document.createElement('span');b.className='ics-nav-current-badge';b.textContent='目前';i.querySelector('.ics-nav-text').appendChild(b)}
+});
+t.addEventListener('click',function(e){e.stopPropagation();m.classList.toggle('open');t.classList.toggle('active')});
+document.addEventListener('click',function(e){if(!document.getElementById('icsNavWidget').contains(e.target)){m.classList.remove('open');t.classList.remove('active')}});
+})();
+</script>
+<!-- ═══ End ICS Nav Widget ═══ --></body>
 </html>
