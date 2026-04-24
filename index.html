@@ -1150,7 +1150,102 @@ body {
 </head>
 <body>
 
-<!-- 頂部品牌條 -->
+<!-- ═══ 🔐 登入鎖屏 ═══ -->
+<div id="auth-overlay" style="display:none;position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#FDFBF8 0%,#FDF3F4 100%);overflow-y:auto">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px">
+    <div style="max-width:420px;width:100%;background:#fff;border:1px solid #E8E3DA;border-radius:12px;padding:32px 24px;box-shadow:0 16px 48px rgba(42,26,28,.08)">
+      
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="width:72px;height:72px;margin:0 auto 16px;border-radius:16px;background:linear-gradient(135deg,#B51E28,#7A1018);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:28px;font-weight:900;box-shadow:0 12px 32px rgba(165,24,32,.25)">S</div>
+        <div style="font-family:'Noto Serif TC',serif;font-size:22px;font-weight:900;color:#2A1A1C;margin-bottom:4px">ICS Scripts</div>
+        <div style="font-size:11px;color:#A51820;letter-spacing:.25em;font-weight:700;margin-bottom:8px">PRIVATE · FOUNDERS ONLY</div>
+        <div style="font-size:12px;color:#7A5A5E;font-style:italic">請登入以繼續</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <label style="display:block;font-size:11px;color:#7A5A5E;font-weight:700;letter-spacing:1px;margin-bottom:6px">電子郵件</label>
+          <input type="email" id="auth-email" autocomplete="email" style="width:100%;padding:12px 14px;border:1px solid #E8E3DA;border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;background:#FDFBF8" placeholder="your@email.com">
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;color:#7A5A5E;font-weight:700;letter-spacing:1px;margin-bottom:6px">密碼</label>
+          <input type="password" id="auth-password" autocomplete="current-password" style="width:100%;padding:12px 14px;border:1px solid #E8E3DA;border-radius:6px;font-size:14px;font-family:inherit;box-sizing:border-box;background:#FDFBF8" placeholder="••••••••••••">
+        </div>
+
+        <div id="auth-error" style="display:none;background:#FAE8EA;border:1px solid #A51820;color:#A51820;padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.6"></div>
+
+        <button id="auth-login-btn" style="background:linear-gradient(135deg,#B51E28,#7A1018);color:#fff;border:none;padding:14px;border-radius:6px;font-size:14px;font-weight:700;letter-spacing:2px;font-family:'Noto Serif TC',serif;cursor:pointer;margin-top:4px">登 入</button>
+
+        <button id="auth-reset-btn" style="background:transparent;color:#7A5A5E;border:none;padding:8px;font-size:11px;cursor:pointer;text-decoration:underline;font-family:inherit">忘記密碼？</button>
+      </div>
+
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid #E8E3DA;text-align:center">
+        <div style="font-family:'Noto Serif TC',serif;font-size:11px;color:#A51820;letter-spacing:.25em;font-weight:700">INSPIRE · CREATE · SHINE</div>
+        <div style="font-size:10px;color:#B09498;font-style:italic;margin-top:4px">Finding beauty. Making it move.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Auth 控制腳本 -->
+<script>
+(function(){
+  function initAuth(){
+    if(!window.__FIREBASE__ || !window.__FIREBASE__.auth){ setTimeout(initAuth, 300); return; }
+    const auth = window.__FIREBASE__.auth;
+    const F = window.__FIREBASE__;
+    const overlay = document.getElementById('auth-overlay');
+    const emailInput = document.getElementById('auth-email');
+    const passwordInput = document.getElementById('auth-password');
+    const loginBtn = document.getElementById('auth-login-btn');
+    const resetBtn = document.getElementById('auth-reset-btn');
+    const errorBox = document.getElementById('auth-error');
+
+    function showError(msg){ errorBox.textContent = msg; errorBox.style.display = 'block'; }
+    function hideError(){ errorBox.style.display = 'none'; }
+
+    function doLogin(){
+      hideError();
+      const email = emailInput.value.trim();
+      const pwd = passwordInput.value;
+      if(!email || !pwd){ showError('請輸入電子郵件和密碼'); return; }
+      loginBtn.textContent = '登入中...';
+      loginBtn.disabled = true;
+      F.signInWithEmailAndPassword(auth, email, pwd)
+        .catch(function(err){
+          loginBtn.textContent = '登 入';
+          loginBtn.disabled = false;
+          const msg = {
+            'auth/invalid-email': '電子郵件格式錯誤',
+            'auth/user-not-found': '找不到這個帳號',
+            'auth/wrong-password': '密碼錯誤',
+            'auth/invalid-credential': '電子郵件或密碼錯誤',
+            'auth/too-many-requests': '嘗試太多次，請稍後再試',
+            'auth/network-request-failed': '網路連線失敗'
+          }[err.code] || ('登入失敗：' + err.message);
+          showError(msg);
+        });
+    }
+
+    loginBtn.addEventListener('click', doLogin);
+    passwordInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ doLogin(); }});
+    emailInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ passwordInput.focus(); }});
+
+    resetBtn.addEventListener('click', function(){
+      const email = emailInput.value.trim();
+      if(!email){ showError('請先填電子郵件'); return; }
+      F.sendPasswordResetEmail(auth, email)
+        .then(function(){ alert('重設密碼信已寄到 ' + email); })
+        .catch(function(err){ showError('寄送失敗：' + err.message); });
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initAuth);
+  } else {
+    initAuth();
+  }
+})();
+</script>
 <div class="brand-bar">
   <div class="logo">
     短影音代理營運｜腳本產生器
@@ -6254,41 +6349,70 @@ function openPresentationView() {
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- Firebase SDK 載入與初始化                                      -->
+<!-- Firebase SDK 載入與初始化（V6 · 接 lucky-handbook 集中派）   -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
   import { 
     getFirestore, collection, addDoc, getDocs, deleteDoc, doc, 
-    query, orderBy, serverTimestamp, onSnapshot 
+    query, orderBy, serverTimestamp, onSnapshot, where 
   } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  import {
+    getAuth, onAuthStateChanged, signInWithEmailAndPassword, 
+    signOut, sendPasswordResetEmail, setPersistence, browserLocalPersistence
+  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-  // 你的 Firebase 專案設定
+  // 連接 lucky-handbook（集中派主資料庫）
   const firebaseConfig = {
-    apiKey: "AIzaSyB9LITVD28W4234k2Kb2ifvhWQZ6RbBsTE",
-    authDomain: "script-generator-96d5b.firebaseapp.com",
-    projectId: "script-generator-96d5b",
-    storageBucket: "script-generator-96d5b.firebasestorage.app",
-    messagingSenderId: "443973037389",
-    appId: "1:443973037389:web:fcc555d34ff45e68b39b04",
-    measurementId: "G-SS6ZTHHK3S"
+    apiKey: "AIzaSyDSw-N0KsSXUdKHEatiJa3tut0m279C_38",
+    authDomain: "lucky-handbook.firebaseapp.com",
+    projectId: "lucky-handbook",
+    storageBucket: "lucky-handbook.firebasestorage.app",
+    messagingSenderId: "618597633790",
+    appId: "1:618597633790:web:e25c4c7b48406b99d6dfaf"
   };
+
+  // FOUNDER UID（lucky-handbook 裡的）
+  const FOUNDER_UID = "7PVhEyBe9XbEcdAqbq2uLtEqRLC2";
 
   // 初始化
   const firebaseApp = initializeApp(firebaseConfig);
   const db = getFirestore(firebaseApp);
+  const auth = getAuth(firebaseApp);
+  setPersistence(auth, browserLocalPersistence);
 
-  // 把 Firebase 工具掛到全域，讓主程式可以使用
+  // 把 Firebase 工具掛到全域
   window.__FIREBASE__ = {
-    db,
+    db, auth,
     collection, addDoc, getDocs, deleteDoc, doc,
-    query, orderBy, serverTimestamp, onSnapshot,
-    isReady: true
+    query, orderBy, where, serverTimestamp, onSnapshot,
+    onAuthStateChanged, signInWithEmailAndPassword, 
+    signOut, sendPasswordResetEmail,
+    FOUNDER_UID,
+    isReady: true,
+    currentUser: null
   };
+
+  // 監聽登入狀態
+  onAuthStateChanged(auth, (user) => {
+    window.__FIREBASE__.currentUser = user;
+    const overlay = document.getElementById('auth-overlay');
+    if (user) {
+      if (overlay) overlay.style.display = 'none';
+      document.body.style.overflow = '';
+      if (user.uid === FOUNDER_UID) {
+        document.body.setAttribute('data-role', 'founder');
+      }
+      window.dispatchEvent(new CustomEvent('ics-auth-ready', {detail:{user:user}}));
+    } else {
+      if (overlay) overlay.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+  });
 
   // 告訴主程式 Firebase 好了
   window.dispatchEvent(new Event('firebaseReady'));
-  console.log('[Firebase] 已連線到 script-generator-96d5b');
+  console.log('[Firebase] 已連線到 lucky-handbook（集中派）');
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
