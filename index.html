@@ -4432,9 +4432,8 @@ const feedManager = {
       try {
         if (window.syncStatus) window.syncStatus.set('syncing', '☁️ 更新中...');
         const FB = window.__FIREBASE__;
-        // Firestore 需要用 setDoc 或 updateDoc，但我們先用重寫的方式
-        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js");
-        await updateDoc(FB.doc(FB.db, FEED_COLLECTION, id), newData);
+        // V3：用 v9 compat 的 updateDoc（已包在 __FIREBASE__ 裡）
+        await FB.updateDoc(FB.doc(FB.db, FEED_COLLECTION, id), newData);
         return;
       } catch(e) {
         console.error('[Firebase] 更新失敗:', e);
@@ -6349,19 +6348,13 @@ function openPresentationView() {
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- Firebase SDK 載入與初始化（V6 · 接 lucky-handbook 集中派）   -->
+<!-- Firebase SDK V3 · 改用 v9 compat · 跟 Handbook 共享登入狀態  -->
 <!-- ═══════════════════════════════════════════════════════════ -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { 
-    getFirestore, collection, addDoc, getDocs, deleteDoc, doc, 
-    query, orderBy, serverTimestamp, onSnapshot, where 
-  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-  import {
-    getAuth, onAuthStateChanged, signInWithEmailAndPassword, 
-    signOut, sendPasswordResetEmail, setPersistence, browserLocalPersistence
-  } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
+(function(){
   // 連接 lucky-handbook（集中派主資料庫）
   const firebaseConfig = {
     apiKey: "AIzaSyDSw-N0KsSXUdKHEatiJa3tut0m279C_38",
@@ -6372,29 +6365,72 @@ function openPresentationView() {
     appId: "1:618597633790:web:e25c4c7b48406b99d6dfaf"
   };
 
-  // FOUNDER UID（lucky-handbook 裡的）
   const FOUNDER_UID = "7PVhEyBe9XbEcdAqbq2uLtEqRLC2";
 
-  // 初始化
-  const firebaseApp = initializeApp(firebaseConfig);
-  const db = getFirestore(firebaseApp);
-  const auth = getAuth(firebaseApp);
-  setPersistence(auth, browserLocalPersistence);
+  // 初始化（檢查是否已經初始化過）
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
-  // 把 Firebase 工具掛到全域
+  // 包裝成原本的 __FIREBASE__ 接口（給 Scripts 既有程式碼用）
+  // v9 compat 用 chain API，要轉成原本 modular 風格的介面
   window.__FIREBASE__ = {
-    db, auth,
-    collection, addDoc, getDocs, deleteDoc, doc,
-    query, orderBy, where, serverTimestamp, onSnapshot,
-    onAuthStateChanged, signInWithEmailAndPassword, 
-    signOut, sendPasswordResetEmail,
-    FOUNDER_UID,
+    db: db,
+    auth: auth,
+    FOUNDER_UID: FOUNDER_UID,
     isReady: true,
-    currentUser: null
+    currentUser: null,
+    
+    // Firestore 操作（用 chain API 包裝成 modular 介面）
+    collection: function(dbOrRef, name){ 
+      // 支援兩種呼叫 collection(db, 'x') 或 collection(ref, 'x')
+      if(dbOrRef === db || dbOrRef.collection) return dbOrRef.collection(name);
+      return db.collection(name);
+    },
+    doc: function(dbOrCol, path, id){
+      // 支援 doc(db, 'col', 'id') 或 doc(colRef, 'id')
+      if(id !== undefined){
+        return db.collection(path).doc(id);
+      }
+      if(typeof path === 'string'){
+        return dbOrCol.doc(path);
+      }
+      return dbOrCol.doc();
+    },
+    addDoc: async function(ref, data){ return await ref.add(data); },
+    getDocs: async function(queryRef){ return await queryRef.get(); },
+    deleteDoc: async function(docRef){ return await docRef.delete(); },
+    updateDoc: async function(docRef, data){ return await docRef.update(data); },
+    setDoc: async function(docRef, data, options){ return await docRef.set(data, options || {}); },
+    query: function(ref){
+      // 收集所有後續修飾
+      var q = ref;
+      for(var i=1; i<arguments.length; i++){
+        var m = arguments[i];
+        if(m && m.__kind === 'orderBy'){ q = q.orderBy(m.field, m.direction || 'asc'); }
+        else if(m && m.__kind === 'where'){ q = q.where(m.field, m.op, m.value); }
+        else if(m && m.__kind === 'limit'){ q = q.limit(m.n); }
+      }
+      return q;
+    },
+    orderBy: function(field, direction){ return { __kind:'orderBy', field:field, direction:direction }; },
+    where: function(field, op, value){ return { __kind:'where', field:field, op:op, value:value }; },
+    limit: function(n){ return { __kind:'limit', n:n }; },
+    serverTimestamp: function(){ return firebase.firestore.FieldValue.serverTimestamp(); },
+    onSnapshot: function(ref, cb, errCb){ return ref.onSnapshot(cb, errCb); },
+    
+    // Auth 操作
+    onAuthStateChanged: function(authInstance, cb){ return authInstance.onAuthStateChanged(cb); },
+    signInWithEmailAndPassword: function(authInstance, email, pwd){ return authInstance.signInWithEmailAndPassword(email, pwd); },
+    signOut: function(authInstance){ return authInstance.signOut(); },
+    sendPasswordResetEmail: function(authInstance, email){ return authInstance.sendPasswordResetEmail(email); }
   };
 
   // 監聽登入狀態
-  onAuthStateChanged(auth, (user) => {
+  auth.onAuthStateChanged(function(user){
     window.__FIREBASE__.currentUser = user;
     const overlay = document.getElementById('auth-overlay');
     if (user) {
@@ -6410,9 +6446,9 @@ function openPresentationView() {
     }
   });
 
-  // 告訴主程式 Firebase 好了
   window.dispatchEvent(new Event('firebaseReady'));
-  console.log('[Firebase] 已連線到 lucky-handbook（集中派）');
+  console.log('[Firebase V3] 已用 v9 compat 連接 lucky-handbook');
+})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
